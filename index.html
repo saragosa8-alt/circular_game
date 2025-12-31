@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket Matching Game</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: auto;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    .app-wrapper {
+      min-height: 100%;
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 24px 16px;
+    }
+
+    .game-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .game-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 12px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .instructions {
+      font-size: 16px;
+      color: rgba(255,255,255,0.95);
+      margin: 0;
+    }
+
+    .progress-container {
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .progress-label {
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .progress-bar-bg {
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      height: 12px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .circle-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circle-background {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 55%;
+      height: 55%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, transparent 70%);
+      border: 1px dashed rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+
+    .definitions-orbit {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .definition-node {
+      position: absolute;
+      width: 180px;
+      transform-origin: center;
+      transition: all 0.3s ease;
+    }
+
+    .definition-card {
+      background: rgba(255,255,255,0.95);
+      color: #1f2937;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .definition-node.drag-over .definition-card {
+      transform: scale(1.15);
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.9), 0 6px 20px rgba(0,0,0,0.3);
+      border: 3px solid #fbbf24;
+    }
+
+    .definition-node.has-match .definition-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(255,255,255,0.95) 100%);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .term-socket {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 8px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .definition-node.has-match .term-socket {
+      opacity: 1;
+    }
+
+    .terms-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 35%;
+      height: 35%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .term-card {
+      background: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      border: 2px solid transparent;
+      white-space: nowrap;
+      position: relative;
+      z-index: 10;
+    }
+
+    .term-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .term-card:active {
+      cursor: grabbing;
+    }
+
+    .term-card.dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .term-card-clone {
+      position: fixed;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0.95;
+      transform: rotate(5deg) scale(1.1);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+
+    .term-card.docked {
+      background: #8b5cf6;
+      cursor: grab;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+      animation: dockPulse 0.5s ease;
+    }
+
+    @keyframes dockPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .term-card.correct {
+      background: #10b981;
+      animation: celebrate 0.6s ease;
+      pointer-events: none;
+    }
+
+    .term-card.incorrect {
+      background: #ef4444;
+      animation: shake 0.6s ease;
+    }
+
+    @keyframes celebrate {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.15) rotate(-5deg); }
+      50% { transform: scale(1.15) rotate(5deg); }
+      75% { transform: scale(1.15) rotate(-3deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-3deg); }
+      20%, 40%, 60%, 80% { transform: translateX(10px) rotate(3deg); }
+    }
+
+    .term-card.flying {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .term-card.flying.animate {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+
+    .connecting-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 0;
+      background: linear-gradient(to bottom, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0));
+      transform-origin: top center;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .definition-node.has-match .connecting-line {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .circle-container {
+        max-width: 95vw;
+      }
+
+      .definition-node {
+        width: 140px;
+      }
+
+      .definition-card {
+        font-size: 11px;
+        padding: 12px;
+        height: 90px;
+      }
+
+      .term-card {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+
+      .game-title {
+        font-size: 28px;
+      }
+
+      .terms-center {
+        width: 40%;
+        height: 40%;
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .definition-node {
+        width: 120px;
+      }
+
+      .definition-card {
+        font-size: 10px;
+        padding: 10px;
+        height: 80px;
+      }
+
+      .term-card {
+        font-size: 11px;
+        padding: 8px 14px;
+      }
+
+      .terms-center {
+        width: 42%;
+        height: 42%;
+      }
+    }
+
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      backdrop-filter: blur(4px);
+    }
+
+    .success-modal.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .success-content {
+      background: white;
+      padding: 48px;
+      border-radius: 24px;
+      text-align: center;
+      max-width: 500px;
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .success-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+    }
+
+    .success-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #10b981;
+      margin: 0 0 16px 0;
+    }
+
+    .success-message {
+      font-size: 18px;
+      color: #6b7280;
+      margin: 0 0 32px 0;
+    }
+
+    .reset-button {
+      background: #667eea;
+      color: white;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .reset-button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div class="app-wrapper">
+   <div class="game-container">
+    <header class="header">
+     <h1 class="game-title" id="gameTitle">Match the Terms</h1>
+     <p class="instructions" id="instructions">Drag terms from the center to their matching definitions</p>
+    </header>
+    <div class="progress-container">
+     <div class="progress-label"><span>Progress</span> <span id="progressText">0/5 Matched</span>
+     </div>
+     <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressBar"></div>
+     </div>
+    </div>
+    <div class="circle-container">
+     <div class="circle-background"></div>
+     <div class="definitions-orbit" id="definitionsOrbit"></div>
+     <div class="terms-center" id="termsCenter"></div>
+    </div>
+   </div>
+  </div>
+  <div class="success-modal" id="successModal">
+   <div class="success-content">
+    <div class="success-icon">
+     🎉
+    </div>
+    <h2 class="success-title">Perfect Score!</h2>
+    <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: '#667eea',
+      surface_color: '#3b82f6',
+      text_color: '#1f2937',
+      primary_action_color: '#ffffff',
+      secondary_action_color: '#8b5cf6',
+      font_family: 'Inter',
+      font_size: 16,
+      game_title: 'Match the Terms',
+      instruction_text: 'Drag terms from the center to their matching definitions',
+      submit_button_text: 'Check Answers',
+      success_message: 'You matched all the terms correctly!'
+    };
+
+    const gameData = [
+      { term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into energy', id: 1 },
+      { term: 'Mitochondria', definition: 'The powerhouse of the cell that produces ATP', id: 2 },
+      { term: 'DNA', definition: 'Genetic material that carries hereditary information', id: 3 },
+      { term: 'Ecosystem', definition: 'A community of living organisms and their environment', id: 4 },
+      { term: 'Homeostasis', definition: 'The ability of an organism to maintain stable internal conditions', id: 5 }
+    ];
+
+    let draggedElement = null;
+    let draggedTermId = null;
+    let sourceNode = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+    let dragClone = null;
+    let matchedCount = 0;
+
+    async function onConfigChange(config) {
+      const finalConfig = { ...defaultConfig, ...config };
+
+      document.querySelector('.app-wrapper').style.background =
+        `linear-gradient(135deg, ${finalConfig.background_color} 0%, ${adjustColorBrightness(finalConfig.background_color, -20)} 100%)`;
+
+      document.getElementById('gameTitle').textContent = finalConfig.game_title;
+      document.getElementById('instructions').textContent = finalConfig.instruction_text;
+      document.getElementById('successMessage').textContent = finalConfig.success_message;
+
+      const customFont = finalConfig.font_family;
+      const baseFont = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+      document.body.style.fontFamily = `${customFont}, ${baseFont}`;
+
+      const baseSize = finalConfig.font_size;
+      document.querySelector('.game-title').style.fontSize = `${baseSize * 2.25}px`;
+      document.querySelector('.instructions').style.fontSize = `${baseSize}px`;
+
+      document.querySelectorAll('.term-card:not(.docked):not(.correct):not(.incorrect)').forEach(card => {
+        card.style.background = finalConfig.surface_color;
+      });
+
+      document.querySelectorAll('.term-card.docked').forEach(card => {
+        card.style.background = finalConfig.secondary_action_color;
+      });
+    }
+
+    function adjustColorBrightness(color, percent) {
+      const num = parseInt(color.replace('#', ''), 16);
+      const amt = Math.round(2.55 * percent);
+      const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+      const G = Math.min(255, Math.max(0, (num >> 8 & 0x00FF) + amt));
+      const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
+      return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+    }
+
+    function initializeGame() {
+      const termsCenter = document.getElementById('termsCenter');
+      const definitionsOrbit = document.getElementById('definitionsOrbit');
+
+      termsCenter.innerHTML = '';
+      definitionsOrbit.innerHTML = '';
+      matchedCount = 0;
+
+      // Create terms in center
+      gameData.forEach(item => {
+        const termCard = document.createElement('div');
+        termCard.className = 'term-card';
+        termCard.textContent = item.term;
+        termCard.dataset.termId = item.id;
+        termCard.draggable = true;
+
+        termCard.addEventListener('dragstart', handleDragStart);
+        termCard.addEventListener('dragend', handleDragEnd);
+        termCard.addEventListener('touchstart', handleTouchStart, { passive: false });
+        termCard.addEventListener('touchmove', handleTouchMove, { passive: false });
+        termCard.addEventListener('touchend', handleTouchEnd);
+
+        termsCenter.appendChild(termCard);
+      });
+
+      // Create definitions around orbit - positioned further out
+      const totalDefinitions = gameData.length;
+      const angleStep = (2 * Math.PI) / totalDefinitions;
+      const startAngle = -Math.PI / 2; // Start at top
+      const radius = 42; // Increased from 50 to push cards further out
+
+      gameData.forEach((item, index) => {
+        const angle = startAngle + (index * angleStep);
+
+        const node = document.createElement('div');
+        node.className = 'definition-node';
+        node.dataset.correctId = item.id;
+
+        // Position around circle at larger radius
+        const x = 50 + radius * Math.cos(angle);
+        const y = 50 + radius * Math.sin(angle);
+        node.style.left = `${x}%`;
+        node.style.top = `${y}%`;
+        node.style.transform = `translate(-50%, -50%)`;
+
+        const defCard = document.createElement('div');
+        defCard.className = 'definition-card';
+        defCard.textContent = item.definition;
+
+        const socket = document.createElement('div');
+        socket.className = 'term-socket';
+
+        const line = document.createElement('div');
+        line.className = 'connecting-line';
+
+        // Calculate line to center
+        const lineLength = Math.sqrt(Math.pow(x - 50, 2) + Math.pow(y - 50, 2));
+        const lineAngle = Math.atan2(50 - y, 50 - x) * (180 / Math.PI) + 90;
+        line.style.height = `${lineLength}%`;
+        line.style.transform = `rotate(${lineAngle}deg)`;
+
+        node.addEventListener('dragover', handleDragOver);
+        node.addEventListener('dragleave', handleDragLeave);
+        node.addEventListener('drop', handleDrop);
+
+        node.appendChild(line);
+        node.appendChild(defCard);
+        node.appendChild(socket);
+        definitionsOrbit.appendChild(node);
+      });
+
+      updateProgress();
+    }
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      draggedTermId = e.target.dataset.termId;
+
+      const parentNode = e.target.closest('.definition-node');
+      if (parentNode) {
+        sourceNode = parentNode;
+      }
+
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+      document.querySelectorAll('.definition-node').forEach(node => {
+        node.classList.remove('drag-over');
+      });
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const node = e.currentTarget;
+      if (!node.classList.contains('has-match')) {
+        node.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave(e) {
+      if (e.currentTarget.contains(e.relatedTarget)) return;
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const node = e.currentTarget;
+      node.classList.remove('drag-over');
+
+      // Don't allow dropping on already matched nodes
+      if (node.classList.contains('has-match')) return;
+
+      const correctId = node.dataset.correctId;
+      const droppedId = draggedTermId;
+
+      // Check if match is correct
+      if (correctId === droppedId) {
+        handleCorrectMatch(node, draggedElement);
+      } else {
+        handleIncorrectMatch(draggedElement);
+      }
+
+      draggedElement = null;
+      draggedTermId = null;
+      sourceNode = null;
+    }
+
+    function handleCorrectMatch(node, termCard) {
+      const socket = node.querySelector('.term-socket');
+      const rect = termCard.getBoundingClientRect();
+
+      // Create flying clone
+      const flyingClone = termCard.cloneNode(true);
+      flyingClone.className = 'term-card flying';
+      flyingClone.style.left = `${rect.left}px`;
+      flyingClone.style.top = `${rect.top}px`;
+      flyingClone.style.width = `${rect.width}px`;
+      flyingClone.style.height = `${rect.height}px`;
+      document.body.appendChild(flyingClone);
+
+      // Hide original
+      termCard.style.visibility = 'hidden';
+
+      // Get progress bar position
+      const progressBar = document.getElementById('progressBar');
+      const targetRect = progressBar.getBoundingClientRect();
+
+      // Animate to progress bar
+      requestAnimationFrame(() => {
+        flyingClone.classList.add('animate');
+        flyingClone.style.left = `${targetRect.left + targetRect.width / 2}px`;
+        flyingClone.style.top = `${targetRect.top + targetRect.height / 2}px`;
+      });
+
+      // After animation, show in socket
+      setTimeout(() => {
+        flyingClone.remove();
+
+        // Move to socket
+        socket.appendChild(termCard);
+        termCard.style.visibility = 'visible';
+        termCard.classList.remove('dragging');
+        termCard.classList.add('docked', 'correct');
+        termCard.draggable = false;
+
+        node.classList.add('has-match');
+
+        matchedCount++;
+        updateProgress();
+
+        // Check if all matched
+        if (matchedCount === gameData.length) {
+          setTimeout(() => {
+            document.getElementById('successModal').classList.add('show');
+          }, 600);
+        }
+      }, 800);
+    }
+
+    function handleIncorrectMatch(termCard) {
+      termCard.classList.add('incorrect');
+      termCard.classList.remove('dragging');
+
+      setTimeout(() => {
+        termCard.classList.remove('incorrect');
+        returnTermToCenter(termCard);
+      }, 600);
+    }
+
+    function handleTouchStart(e) {
+      draggedElement = e.target;
+      draggedTermId = e.target.dataset.termId;
+
+      const parentNode = e.target.closest('.definition-node');
+      if (parentNode) {
+        sourceNode = parentNode;
+      }
+
+      const touch = e.touches[0];
+      const rect = e.target.getBoundingClientRect();
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+
+      e.target.classList.add('dragging');
+
+      dragClone = e.target.cloneNode(true);
+      dragClone.classList.remove('dragging');
+      dragClone.classList.add('term-card-clone');
+      dragClone.style.width = `${rect.width}px`;
+      dragClone.style.height = `${rect.height}px`;
+      dragClone.style.left = `${touch.clientX - touchOffsetX}px`;
+      dragClone.style.top = `${touch.clientY - touchOffsetY}px`;
+      document.body.appendChild(dragClone);
+    }
+
+    function handleTouchMove(e) {
+      if (!draggedElement || !dragClone) return;
+      e.preventDefault();
+
+      const touch = e.touches[0];
+      dragClone.style.left = `${touch.clientX - touchOffsetX}px`;
+      dragClone.style.top = `${touch.clientY - touchOffsetY}px`;
+
+      const nodeUnder = findNodeUnderTouch(touch.clientX, touch.clientY);
+      document.querySelectorAll('.definition-node').forEach(n => n.classList.remove('drag-over'));
+      if (nodeUnder && !nodeUnder.classList.contains('has-match')) {
+        nodeUnder.classList.add('drag-over');
+      }
+    }
+
+    function handleTouchEnd(e) {
+      if (!draggedElement) return;
+
+      const touch = e.changedTouches[0];
+      const nodeUnder = findNodeUnderTouch(touch.clientX, touch.clientY);
+
+      draggedElement.classList.remove('dragging');
+
+      if (dragClone) {
+        dragClone.remove();
+        dragClone = null;
+      }
+
+      document.querySelectorAll('.definition-node').forEach(n => n.classList.remove('drag-over'));
+
+      if (nodeUnder && !nodeUnder.classList.contains('has-match')) {
+        const correctId = nodeUnder.dataset.correctId;
+        const droppedId = draggedTermId;
+
+        if (correctId === droppedId) {
+          handleCorrectMatch(nodeUnder, draggedElement);
+        } else {
+          handleIncorrectMatch(draggedElement);
+        }
+      } else {
+        draggedElement.classList.remove('dragging');
+        if (sourceNode) {
+          const socket = sourceNode.querySelector('.term-socket');
+          socket.appendChild(draggedElement);
+          draggedElement.classList.add('docked');
+        }
+      }
+
+      draggedElement = null;
+      draggedTermId = null;
+      sourceNode = null;
+    }
+
+    function findNodeUnderTouch(x, y) {
+      const nodes = document.querySelectorAll('.definition-node');
+      for (let node of nodes) {
+        const card = node.querySelector('.definition-card');
+        const rect = card.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+          return node;
+        }
+      }
+      return null;
+    }
+
+    function returnTermToCenter(termCard) {
+      const termsCenter = document.getElementById('termsCenter');
+      termCard.classList.remove('docked', 'correct', 'incorrect', 'dragging');
+      termCard.draggable = true;
+      termsCenter.appendChild(termCard);
+    }
+
+    function updateProgress() {
+      const total = gameData.length;
+      const percentage = (matchedCount / total) * 100;
+
+      document.getElementById('progressBar').style.width = `${percentage}%`;
+      document.getElementById('progressText').textContent = `${matchedCount}/${total} Matched`;
+    }
+
+    function resetGame() {
+      document.getElementById('successModal').classList.remove('show');
+      initializeGame();
+    }
+
+    document.getElementById('resetButton').addEventListener('click', resetGame);
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['game_title', config.game_title || defaultConfig.game_title],
+          ['instruction_text', config.instruction_text || defaultConfig.instruction_text],
+          ['submit_button_text', config.submit_button_text || defaultConfig.submit_button_text],
+          ['success_message', config.success_message || defaultConfig.success_message]
+        ])
+      });
+    }
+
+    initializeGame();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b696c59c5696e29',t:'MTc2NzE4MDQwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
