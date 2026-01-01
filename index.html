@@ -101,248 +101,138 @@
       width: 0%;
     }
 
-    .circle-container {
+    .play-area {
       position: relative;
       width: 100%;
-      max-width: min(90vw, 700px);
-      height: min(90vw, 700px);
+      min-height: 600px;
+      max-width: 1200px;
       margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 24px;
+      border: 2px dashed rgba(255,255,255,0.1);
+      overflow: hidden;
     }
 
-    .circle-background {
+    .game-piece {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50%;
-      height: 50%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 50%, transparent 70%);
-      border: 1px dashed rgba(255,255,255,0.05);
-      pointer-events: none;
-      animation: circle-breathe 8s ease-in-out infinite;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.3s ease;
+      transform-origin: center;
     }
 
-    @keyframes circle-breathe {
+    .game-piece:active {
+      cursor: grabbing;
+      z-index: 1000;
+    }
+
+    .game-piece.dragging {
+      opacity: 0.8;
+      cursor: grabbing;
+      transform: scale(1.05);
+      z-index: 1000;
+    }
+
+    .game-piece.in-range {
+      animation: glow-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes glow-pulse {
       0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), 0 4px 12px rgba(0,0,0,0.15);
       }
       50% {
-        transform: translate(-50%, -50%) scale(1.05);
-        opacity: 0.6;
+        box-shadow: 0 0 35px rgba(251, 191, 36, 0.9), 0 6px 16px rgba(0,0,0,0.2);
       }
     }
-
-    .definitions-orbit {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-    }
-
-    .definition-node {
-      position: absolute;
-      width: var(--definition-width);
-      transform-origin: center;
-      transition: all 0.3s ease;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-      50% { transform: translate(-50%, -50%) translateY(-8px); }
-    }
-
-    .definition-node:nth-child(1) { animation-delay: 0s; }
-    .definition-node:nth-child(2) { animation-delay: 0.5s; }
-    .definition-node:nth-child(3) { animation-delay: 1s; }
-    .definition-node:nth-child(4) { animation-delay: 1.5s; }
-    .definition-node:nth-child(5) { animation-delay: 2s; }
 
     .definition-card {
       background: rgba(255,255,255,0.95);
       color: #1f2937;
-      padding: clamp(8px, 1.5vw, 14px);
+      padding: 16px;
       border-radius: 12px;
-      font-size: var(--definition-font-size);
-      line-height: 1.4;
+      font-size: 14px;
+      line-height: 1.5;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      height: var(--definition-height);
+      min-width: 180px;
+      max-width: 220px;
+      min-height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      cursor: pointer;
+      cursor: grab;
       font-weight: 500;
     }
 
-    .definition-node.drag-over .definition-card {
-      transform: scale(1.15);
-      box-shadow: 0 0 30px rgba(251, 191, 36, 0.9), 0 6px 20px rgba(0,0,0,0.3);
-      border: 3px solid #fbbf24;
+    .definition-card:active {
+      cursor: grabbing;
     }
 
-    .definition-node.has-match .definition-card {
+    .game-piece.matched {
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(255,255,255,0.95) 100%);
       box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .term-socket {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 8px;
-      opacity: 0;
-      transition: all 0.3s ease;
-      pointer-events: none;
-    }
-
-    .definition-node.has-match .term-socket {
-      opacity: 1;
-    }
-
-    .terms-center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: var(--center-size);
-      height: var(--center-size);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: var(--gap-size);
-      padding: clamp(4px, 1vw, 8px);
     }
 
     .term-card {
       background: #3b82f6;
       color: white;
-      padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
+      padding: 10px 20px;
       border-radius: 50px;
       font-weight: 600;
-      font-size: var(--term-font-size);
+      font-size: 14px;
       cursor: grab;
       user-select: none;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border: 2px solid transparent;
       white-space: nowrap;
       position: relative;
-      z-index: 10;
-      animation: gentle-pulse 4s ease-in-out infinite;
-    }
-
-    @keyframes gentle-pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-    }
-
-    .term-card:nth-child(odd) {
-      animation-delay: 0.5s;
-    }
-
-    .term-card:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-      animation-play-state: paused;
-    }
-
-    .definition-node:hover {
-      animation-play-state: paused;
     }
 
     .term-card:active {
       cursor: grabbing;
     }
 
-    .term-card.dragging {
-      opacity: 0.4;
-      cursor: grabbing;
-      transform: scale(0.95);
+    .term-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     }
 
-    .term-card-clone {
-      position: fixed;
-      z-index: 10000;
-      pointer-events: none;
-      opacity: 0.95;
-      transform: rotate(5deg) scale(1.1);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    .matched-pair {
+      position: relative;
     }
 
-    .term-card.docked {
-      background: #8b5cf6;
-      cursor: grab;
-      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
-      animation: dockPulse 0.5s ease;
-    }
-
-    @keyframes dockPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .term-card.correct {
-      background: #10b981;
-      animation: celebrate 0.6s ease;
-      pointer-events: none;
-    }
-
-    .term-card.incorrect {
-      background: #ef4444;
-      animation: shake 0.6s ease;
-    }
-
-    @keyframes celebrate {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.15) rotate(-5deg); }
-      50% { transform: scale(1.15) rotate(5deg); }
-      75% { transform: scale(1.15) rotate(-3deg); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0) rotate(0deg); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-3deg); }
-      20%, 40%, 60%, 80% { transform: translateX(10px) rotate(3deg); }
-    }
-
-    .term-card.flying {
-      position: fixed;
-      z-index: 9999;
-      pointer-events: none;
-      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .term-card.flying.animate {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-
-    .connecting-line {
+    .connector-line {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 2px;
-      height: 0;
-      background: linear-gradient(to bottom, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0));
-      transform-origin: top center;
-      opacity: 0;
-      transition: all 0.3s ease;
+      background: #8b5cf6;
+      height: 3px;
+      transform-origin: left center;
       pointer-events: none;
-      z-index: 5;
+      z-index: 0;
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
     }
 
-    .definition-node.has-match .connecting-line {
-      opacity: 1;
+    .connector-tab {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #8b5cf6;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      pointer-events: none;
+    }
+
+    @keyframes snap-animation {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .game-piece.snapping {
+      animation: snap-animation 0.4s ease;
     }
 
     @media (max-width: 768px) {
@@ -476,11 +366,7 @@
       <div class="progress-bar-fill" id="progressBar"></div>
      </div>
     </div>
-    <div class="circle-container">
-     <div class="circle-background"></div>
-     <div class="definitions-orbit" id="definitionsOrbit"></div>
-     <div class="terms-center" id="termsCenter"></div>
-    </div>
+    <div class="play-area" id="playArea"></div>
    </div>
   </div>
   <div class="success-modal" id="successModal">
@@ -502,7 +388,7 @@
       font_family: 'Inter',
       font_size: 16,
       game_title: 'Match the Terms',
-      instruction_text: 'Drag terms from the center to their matching definitions',
+      instruction_text: 'Drag pieces near their matches to snap them together',
       submit_button_text: 'Check Answers',
       success_message: 'You matched all the terms correctly!'
     };
@@ -515,12 +401,6 @@
       { term: 'Homeostasis', definition: 'The ability of an organism to maintain stable internal conditions', id: 5 }
     ];
 
-    let draggedElement = null;
-    let draggedTermId = null;
-    let sourceNode = null;
-    let touchOffsetX = 0;
-    let touchOffsetY = 0;
-    let dragClone = null;
     let matchedCount = 0;
 
     async function onConfigChange(config) {
@@ -559,299 +439,451 @@
       return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
     }
 
+    const pieces = new Map(); // Store piece data and state
+    const matchedPairs = new Map(); // Store matched pairs
+    const SNAP_DISTANCE = 150; // Distance in pixels for magnetic snap
+
+    function getRandomPosition(playArea, pieceWidth, pieceHeight) {
+      const areaWidth = playArea.offsetWidth;
+      const areaHeight = playArea.offsetHeight;
+
+      const margin = 40;
+      const x = margin + Math.random() * (areaWidth - pieceWidth - margin * 2);
+      const y = margin + Math.random() * (areaHeight - pieceHeight - margin * 2);
+
+      return { x, y };
+    }
+
+    function getRandomRotation() {
+      return (Math.random() - 0.5) * 30; // ±15 degrees
+    }
+
     function initializeGame() {
-      const termsCenter = document.getElementById('termsCenter');
-      const definitionsOrbit = document.getElementById('definitionsOrbit');
-
-      termsCenter.innerHTML = '';
-      definitionsOrbit.innerHTML = '';
+      const playArea = document.getElementById('playArea');
+      playArea.innerHTML = '';
       matchedCount = 0;
+      pieces.clear();
+      matchedPairs.clear();
 
-      // Create terms in center
+      // Create all pieces (both terms and definitions) and scatter them randomly
       gameData.forEach(item => {
-        const termCard = document.createElement('div');
-        termCard.className = 'term-card';
-        termCard.textContent = item.term;
-        termCard.dataset.termId = item.id;
-        termCard.draggable = true;
+        // Create term piece
+        const termPiece = document.createElement('div');
+        termPiece.className = 'game-piece term-card';
+        termPiece.textContent = item.term;
+        termPiece.dataset.id = item.id;
+        termPiece.dataset.type = 'term';
 
-        termCard.addEventListener('dragstart', handleDragStart);
-        termCard.addEventListener('dragend', handleDragEnd);
-        termCard.addEventListener('touchstart', handleTouchStart, { passive: false });
-        termCard.addEventListener('touchmove', handleTouchMove, { passive: false });
-        termCard.addEventListener('touchend', handleTouchEnd);
+        const termPos = getRandomPosition(playArea, 150, 50);
+        const termRotation = getRandomRotation();
+        termPiece.style.left = `${termPos.x}px`;
+        termPiece.style.top = `${termPos.y}px`;
+        termPiece.style.transform = `rotate(${termRotation}deg)`;
 
-        termsCenter.appendChild(termCard);
-      });
+        pieces.set(`term-${item.id}`, {
+          element: termPiece,
+          id: item.id,
+          type: 'term',
+          x: termPos.x,
+          y: termPos.y,
+          rotation: termRotation,
+          matched: false
+        });
 
-      // Create definitions around orbit with adaptive positioning
-      const totalDefinitions = gameData.length;
-      const angleStep = (2 * Math.PI) / totalDefinitions;
-      const startAngle = -Math.PI / 2; // Start at top
+        // Create definition piece
+        const defPiece = document.createElement('div');
+        defPiece.className = 'game-piece definition-card';
+        defPiece.textContent = item.definition;
+        defPiece.dataset.id = item.id;
+        defPiece.dataset.type = 'definition';
 
-      // Adaptive radius based on viewport size
-      const containerWidth = document.getElementById('definitionsOrbit').offsetWidth;
-      const baseRadius = containerWidth > 500 ? 40 : 38;
-      const radius = baseRadius;
+        const defPos = getRandomPosition(playArea, 200, 90);
+        const defRotation = getRandomRotation();
+        defPiece.style.left = `${defPos.x}px`;
+        defPiece.style.top = `${defPos.y}px`;
+        defPiece.style.transform = `rotate(${defRotation}deg)`;
 
-      gameData.forEach((item, index) => {
-        const angle = startAngle + (index * angleStep);
+        pieces.set(`def-${item.id}`, {
+          element: defPiece,
+          id: item.id,
+          type: 'definition',
+          x: defPos.x,
+          y: defPos.y,
+          rotation: defRotation,
+          matched: false
+        });
 
-        const node = document.createElement('div');
-        node.className = 'definition-node';
-        node.dataset.correctId = item.id;
+        // Add drag event listeners to both
+        [termPiece, defPiece].forEach(piece => {
+          piece.addEventListener('mousedown', handleMouseDown);
+          piece.addEventListener('touchstart', handleTouchStart, { passive: false });
+        });
 
-        // Position around circle
-        const x = 50 + radius * Math.cos(angle);
-        const y = 50 + radius * Math.sin(angle);
-        node.style.left = `${x}%`;
-        node.style.top = `${y}%`;
-        node.style.transform = `translate(-50%, -50%)`;
-
-        const defCard = document.createElement('div');
-        defCard.className = 'definition-card';
-        defCard.textContent = item.definition;
-
-        const socket = document.createElement('div');
-        socket.className = 'term-socket';
-
-        const line = document.createElement('div');
-        line.className = 'connecting-line';
-
-        // Calculate line to center
-        const lineLength = Math.sqrt(Math.pow(x - 50, 2) + Math.pow(y - 50, 2));
-        const lineAngle = Math.atan2(50 - y, 50 - x) * (180 / Math.PI) + 90;
-        line.style.height = `${lineLength}%`;
-        line.style.transform = `rotate(${lineAngle}deg)`;
-
-        node.addEventListener('dragover', handleDragOver);
-        node.addEventListener('dragleave', handleDragLeave);
-        node.addEventListener('drop', handleDrop);
-
-        node.appendChild(line);
-        node.appendChild(defCard);
-        node.appendChild(socket);
-        definitionsOrbit.appendChild(node);
+        playArea.appendChild(termPiece);
+        playArea.appendChild(defPiece);
       });
 
       updateProgress();
     }
 
-    function handleDragStart(e) {
-      draggedElement = e.target;
-      draggedTermId = e.target.dataset.termId;
+    let currentDrag = null;
+    let dragOffset = { x: 0, y: 0 };
 
-      const parentNode = e.target.closest('.definition-node');
-      if (parentNode) {
-        sourceNode = parentNode;
-      }
-
-      e.target.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function handleDragEnd(e) {
-      e.target.classList.remove('dragging');
-      document.querySelectorAll('.definition-node').forEach(node => {
-        node.classList.remove('drag-over');
-      });
-    }
-
-    function handleDragOver(e) {
+    function handleMouseDown(e) {
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      const node = e.currentTarget;
-      if (!node.classList.contains('has-match')) {
-        node.classList.add('drag-over');
-      }
+      const piece = e.currentTarget;
+      const pieceKey = `${piece.dataset.type}-${piece.dataset.id}`;
+      const pieceData = pieces.get(pieceKey);
+
+      // Check if this piece is part of a matched pair
+      const pairId = pieceData.matched ? pieceData.id : null;
+      const isDraggingPair = pairId !== null;
+
+      const rect = piece.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+
+      currentDrag = {
+        piece: piece,
+        pieceKey: pieceKey,
+        pieceData: pieceData,
+        pairId: pairId,
+        isDraggingPair: isDraggingPair
+      };
+
+      piece.classList.add('dragging');
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     }
 
-    function handleDragLeave(e) {
-      if (e.currentTarget.contains(e.relatedTarget)) return;
-      e.currentTarget.classList.remove('drag-over');
-    }
+    function handleMouseMove(e) {
+      if (!currentDrag) return;
 
-    function handleDrop(e) {
-      e.preventDefault();
-      const node = e.currentTarget;
-      node.classList.remove('drag-over');
+      const playArea = document.getElementById('playArea');
+      const areaRect = playArea.getBoundingClientRect();
 
-      // Don't allow dropping on already matched nodes
-      if (node.classList.contains('has-match')) return;
+      const x = e.clientX - areaRect.left - dragOffset.x;
+      const y = e.clientY - areaRect.top - dragOffset.y;
 
-      const correctId = node.dataset.correctId;
-      const droppedId = draggedTermId;
+      // Update position
+      currentDrag.piece.style.left = `${x}px`;
+      currentDrag.piece.style.top = `${y}px`;
+      currentDrag.pieceData.x = x;
+      currentDrag.pieceData.y = y;
 
-      // Check if match is correct
-      if (correctId === droppedId) {
-        handleCorrectMatch(node, draggedElement);
-      } else {
-        handleIncorrectMatch(draggedElement);
-      }
+      // If dragging a matched pair, move both pieces together
+      if (currentDrag.isDraggingPair) {
+        const pair = matchedPairs.get(currentDrag.pairId);
+        if (pair) {
+          const otherPieceKey = currentDrag.pieceKey.startsWith('term-') ? `def-${currentDrag.pairId}` : `term-${currentDrag.pairId}`;
+          const otherPieceData = pieces.get(otherPieceKey);
 
-      draggedElement = null;
-      draggedTermId = null;
-      sourceNode = null;
-    }
+          // Calculate offset from stored pair position
+          let dx, dy;
+          if (currentDrag.pieceKey.startsWith('term-')) {
+            dx = x - pair.termX;
+            dy = y - pair.termY;
+            otherPieceData.element.style.left = `${pair.defX + dx}px`;
+            otherPieceData.element.style.top = `${pair.defY + dy}px`;
+            otherPieceData.x = pair.defX + dx;
+            otherPieceData.y = pair.defY + dy;
+          } else {
+            dx = x - pair.defX;
+            dy = y - pair.defY;
+            otherPieceData.element.style.left = `${pair.termX + dx}px`;
+            otherPieceData.element.style.top = `${pair.termY + dy}px`;
+            otherPieceData.x = pair.termX + dx;
+            otherPieceData.y = pair.termY + dy;
+          }
 
-    function handleCorrectMatch(node, termCard) {
-      const socket = node.querySelector('.term-socket');
-      const rect = termCard.getBoundingClientRect();
+          // Update stored pair positions
+          pair.termX = pieces.get(`term-${currentDrag.pairId}`).x;
+          pair.termY = pieces.get(`term-${currentDrag.pairId}`).y;
+          pair.defX = pieces.get(`def-${currentDrag.pairId}`).x;
+          pair.defY = pieces.get(`def-${currentDrag.pairId}`).y;
 
-      // Create flying clone
-      const flyingClone = termCard.cloneNode(true);
-      flyingClone.className = 'term-card flying';
-      flyingClone.style.left = `${rect.left}px`;
-      flyingClone.style.top = `${rect.top}px`;
-      flyingClone.style.width = `${rect.width}px`;
-      flyingClone.style.height = `${rect.height}px`;
-      document.body.appendChild(flyingClone);
-
-      // Hide original
-      termCard.style.visibility = 'hidden';
-
-      // Get progress bar position
-      const progressBar = document.getElementById('progressBar');
-      const targetRect = progressBar.getBoundingClientRect();
-
-      // Animate to progress bar
-      requestAnimationFrame(() => {
-        flyingClone.classList.add('animate');
-        flyingClone.style.left = `${targetRect.left + targetRect.width / 2}px`;
-        flyingClone.style.top = `${targetRect.top + targetRect.height / 2}px`;
-      });
-
-      // After animation, show in socket
-      setTimeout(() => {
-        flyingClone.remove();
-
-        // Move to socket
-        socket.appendChild(termCard);
-        termCard.style.visibility = 'visible';
-        termCard.classList.remove('dragging');
-        termCard.classList.add('docked', 'correct');
-        termCard.draggable = false;
-
-        node.classList.add('has-match');
-
-        matchedCount++;
-        updateProgress();
-
-        // Check if all matched
-        if (matchedCount === gameData.length) {
-          setTimeout(() => {
-            document.getElementById('successModal').classList.add('show');
-          }, 600);
+          updateConnector(currentDrag.pairId);
         }
-      }, 800);
+      } else {
+        // Check for potential matches (magnetic snap)
+        checkForPotentialMatches(currentDrag.pieceData);
+      }
     }
 
-    function handleIncorrectMatch(termCard) {
-      termCard.classList.add('incorrect');
-      termCard.classList.remove('dragging');
+    function handleMouseUp(e) {
+      if (!currentDrag) return;
 
+      currentDrag.piece.classList.remove('dragging');
+
+      // Check if close enough to match
+      if (!currentDrag.isDraggingPair) {
+        attemptMatch(currentDrag.pieceData);
+      }
+
+      // Clear in-range highlights
+      document.querySelectorAll('.in-range').forEach(el => el.classList.remove('in-range'));
+
+      currentDrag = null;
+
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
+
+    function checkForPotentialMatches(pieceData) {
+      // Find the matching piece
+      const otherType = pieceData.type === 'term' ? 'definition' : 'term';
+      const matchingPieceKey = `${otherType}-${pieceData.id}`;
+      const matchingPiece = pieces.get(matchingPieceKey);
+
+      if (!matchingPiece || matchingPiece.matched) return;
+
+      // Calculate distance
+      const distance = Math.sqrt(
+        Math.pow(pieceData.x - matchingPiece.x, 2) +
+        Math.pow(pieceData.y - matchingPiece.y, 2)
+      );
+
+      // Show glow if within snap distance
+      if (distance < SNAP_DISTANCE) {
+        pieceData.element.classList.add('in-range');
+        matchingPiece.element.classList.add('in-range');
+      } else {
+        pieceData.element.classList.remove('in-range');
+        matchingPiece.element.classList.remove('in-range');
+      }
+    }
+
+    function attemptMatch(pieceData) {
+      // Find the matching piece
+      const otherType = pieceData.type === 'term' ? 'definition' : 'term';
+      const matchingPieceKey = `${otherType}-${pieceData.id}`;
+      const matchingPiece = pieces.get(matchingPieceKey);
+
+      if (!matchingPiece || matchingPiece.matched) return;
+
+      // Calculate distance
+      const distance = Math.sqrt(
+        Math.pow(pieceData.x - matchingPiece.x, 2) +
+        Math.pow(pieceData.y - matchingPiece.y, 2)
+      );
+
+      // If within snap distance, connect them
+      if (distance < SNAP_DISTANCE) {
+        createMatch(pieceData.id);
+      }
+    }
+
+    function createMatch(id) {
+      const termPiece = pieces.get(`term-${id}`);
+      const defPiece = pieces.get(`def-${id}`);
+
+      // Mark as matched
+      termPiece.matched = true;
+      defPiece.matched = true;
+
+      // Add visual feedback
+      termPiece.element.classList.add('matched', 'snapping');
+      defPiece.element.classList.add('matched', 'snapping');
+      termPiece.element.classList.remove('in-range');
+      defPiece.element.classList.remove('in-range');
+
+      // Store matched pair position
+      matchedPairs.set(id, {
+        termX: termPiece.x,
+        termY: termPiece.y,
+        defX: defPiece.x,
+        defY: defPiece.y
+      });
+
+      // Create connector visual
+      createConnector(id);
+
+      matchedCount++;
+      updateProgress();
+
+      // Remove snap animation class
       setTimeout(() => {
-        termCard.classList.remove('incorrect');
-        returnTermToCenter(termCard);
-      }, 600);
+        termPiece.element.classList.remove('snapping');
+        defPiece.element.classList.remove('snapping');
+      }, 400);
+
+      // Check if all matched
+      if (matchedCount === gameData.length) {
+        setTimeout(() => {
+          document.getElementById('successModal').classList.add('show');
+        }, 600);
+      }
+    }
+
+    function createConnector(id) {
+      const termPiece = pieces.get(`term-${id}`);
+      const defPiece = pieces.get(`def-${id}`);
+
+      // Create connector line
+      const line = document.createElement('div');
+      line.className = 'connector-line';
+      line.id = `connector-${id}`;
+
+      // Create connector tabs (circles at connection points)
+      const tab1 = document.createElement('div');
+      tab1.className = 'connector-tab';
+      tab1.id = `tab1-${id}`;
+
+      const tab2 = document.createElement('div');
+      tab2.className = 'connector-tab';
+      tab2.id = `tab2-${id}`;
+
+      const playArea = document.getElementById('playArea');
+      playArea.appendChild(line);
+      playArea.appendChild(tab1);
+      playArea.appendChild(tab2);
+
+      updateConnector(id);
+    }
+
+    function updateConnector(id) {
+      const termPiece = pieces.get(`term-${id}`);
+      const defPiece = pieces.get(`def-${id}`);
+
+      if (!termPiece || !defPiece) return;
+
+      const line = document.getElementById(`connector-${id}`);
+      const tab1 = document.getElementById(`tab1-${id}`);
+      const tab2 = document.getElementById(`tab2-${id}`);
+
+      if (!line || !tab1 || !tab2) return;
+
+      // Get centers of pieces
+      const termRect = termPiece.element.getBoundingClientRect();
+      const defRect = defPiece.element.getBoundingClientRect();
+      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
+
+      const termCenterX = termPiece.x + termRect.width / 2;
+      const termCenterY = termPiece.y + termRect.height / 2;
+      const defCenterX = defPiece.x + defRect.width / 2;
+      const defCenterY = defPiece.y + defRect.height / 2;
+
+      // Calculate line position and angle
+      const dx = defCenterX - termCenterX;
+      const dy = defCenterY - termCenterY;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      line.style.left = `${termCenterX}px`;
+      line.style.top = `${termCenterY}px`;
+      line.style.width = `${length}px`;
+      line.style.transform = `rotate(${angle}deg)`;
+
+      // Position tabs
+      tab1.style.left = `${termCenterX - 10}px`;
+      tab1.style.top = `${termCenterY - 10}px`;
+      tab2.style.left = `${defCenterX - 10}px`;
+      tab2.style.top = `${defCenterY - 10}px`;
     }
 
     function handleTouchStart(e) {
-      draggedElement = e.target;
-      draggedTermId = e.target.dataset.termId;
+      e.preventDefault();
+      const piece = e.currentTarget;
+      const pieceKey = `${piece.dataset.type}-${piece.dataset.id}`;
+      const pieceData = pieces.get(pieceKey);
 
-      const parentNode = e.target.closest('.definition-node');
-      if (parentNode) {
-        sourceNode = parentNode;
-      }
+      // Check if this piece is part of a matched pair
+      const pairId = pieceData.matched ? pieceData.id : null;
+      const isDraggingPair = pairId !== null;
 
       const touch = e.touches[0];
-      const rect = e.target.getBoundingClientRect();
-      touchOffsetX = touch.clientX - rect.left;
-      touchOffsetY = touch.clientY - rect.top;
+      const rect = piece.getBoundingClientRect();
+      dragOffset.x = touch.clientX - rect.left;
+      dragOffset.y = touch.clientY - rect.top;
 
-      e.target.classList.add('dragging');
+      currentDrag = {
+        piece: piece,
+        pieceKey: pieceKey,
+        pieceData: pieceData,
+        pairId: pairId,
+        isDraggingPair: isDraggingPair
+      };
 
-      dragClone = e.target.cloneNode(true);
-      dragClone.classList.remove('dragging');
-      dragClone.classList.add('term-card-clone');
-      dragClone.style.width = `${rect.width}px`;
-      dragClone.style.height = `${rect.height}px`;
-      dragClone.style.left = `${touch.clientX - touchOffsetX}px`;
-      dragClone.style.top = `${touch.clientY - touchOffsetY}px`;
-      document.body.appendChild(dragClone);
+      piece.classList.add('dragging');
+
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
     }
 
     function handleTouchMove(e) {
-      if (!draggedElement || !dragClone) return;
+      if (!currentDrag) return;
       e.preventDefault();
 
       const touch = e.touches[0];
-      dragClone.style.left = `${touch.clientX - touchOffsetX}px`;
-      dragClone.style.top = `${touch.clientY - touchOffsetY}px`;
+      const playArea = document.getElementById('playArea');
+      const areaRect = playArea.getBoundingClientRect();
 
-      const nodeUnder = findNodeUnderTouch(touch.clientX, touch.clientY);
-      document.querySelectorAll('.definition-node').forEach(n => n.classList.remove('drag-over'));
-      if (nodeUnder && !nodeUnder.classList.contains('has-match')) {
-        nodeUnder.classList.add('drag-over');
+      const x = touch.clientX - areaRect.left - dragOffset.x;
+      const y = touch.clientY - areaRect.top - dragOffset.y;
+
+      // Update position
+      currentDrag.piece.style.left = `${x}px`;
+      currentDrag.piece.style.top = `${y}px`;
+      currentDrag.pieceData.x = x;
+      currentDrag.pieceData.y = y;
+
+      // If dragging a matched pair, move both pieces together
+      if (currentDrag.isDraggingPair) {
+        const pair = matchedPairs.get(currentDrag.pairId);
+        if (pair) {
+          const otherPieceKey = currentDrag.pieceKey.startsWith('term-') ? `def-${currentDrag.pairId}` : `term-${currentDrag.pairId}`;
+          const otherPieceData = pieces.get(otherPieceKey);
+
+          // Calculate offset from stored pair position
+          let dx, dy;
+          if (currentDrag.pieceKey.startsWith('term-')) {
+            dx = x - pair.termX;
+            dy = y - pair.termY;
+            otherPieceData.element.style.left = `${pair.defX + dx}px`;
+            otherPieceData.element.style.top = `${pair.defY + dy}px`;
+            otherPieceData.x = pair.defX + dx;
+            otherPieceData.y = pair.defY + dy;
+          } else {
+            dx = x - pair.defX;
+            dy = y - pair.defY;
+            otherPieceData.element.style.left = `${pair.termX + dx}px`;
+            otherPieceData.element.style.top = `${pair.termY + dy}px`;
+            otherPieceData.x = pair.termX + dx;
+            otherPieceData.y = pair.termY + dy;
+          }
+
+          // Update stored pair positions
+          pair.termX = pieces.get(`term-${currentDrag.pairId}`).x;
+          pair.termY = pieces.get(`term-${currentDrag.pairId}`).y;
+          pair.defX = pieces.get(`def-${currentDrag.pairId}`).x;
+          pair.defY = pieces.get(`def-${currentDrag.pairId}`).y;
+
+          updateConnector(currentDrag.pairId);
+        }
+      } else {
+        // Check for potential matches (magnetic snap)
+        checkForPotentialMatches(currentDrag.pieceData);
       }
     }
 
     function handleTouchEnd(e) {
-      if (!draggedElement) return;
+      if (!currentDrag) return;
 
-      const touch = e.changedTouches[0];
-      const nodeUnder = findNodeUnderTouch(touch.clientX, touch.clientY);
+      currentDrag.piece.classList.remove('dragging');
 
-      draggedElement.classList.remove('dragging');
-
-      if (dragClone) {
-        dragClone.remove();
-        dragClone = null;
+      // Check if close enough to match
+      if (!currentDrag.isDraggingPair) {
+        attemptMatch(currentDrag.pieceData);
       }
 
-      document.querySelectorAll('.definition-node').forEach(n => n.classList.remove('drag-over'));
+      // Clear in-range highlights
+      document.querySelectorAll('.in-range').forEach(el => el.classList.remove('in-range'));
 
-      if (nodeUnder && !nodeUnder.classList.contains('has-match')) {
-        const correctId = nodeUnder.dataset.correctId;
-        const droppedId = draggedTermId;
+      currentDrag = null;
 
-        if (correctId === droppedId) {
-          handleCorrectMatch(nodeUnder, draggedElement);
-        } else {
-          handleIncorrectMatch(draggedElement);
-        }
-      } else {
-        draggedElement.classList.remove('dragging');
-        if (sourceNode) {
-          const socket = sourceNode.querySelector('.term-socket');
-          socket.appendChild(draggedElement);
-          draggedElement.classList.add('docked');
-        }
-      }
-
-      draggedElement = null;
-      draggedTermId = null;
-      sourceNode = null;
-    }
-
-    function findNodeUnderTouch(x, y) {
-      const nodes = document.querySelectorAll('.definition-node');
-      for (let node of nodes) {
-        const card = node.querySelector('.definition-card');
-        const rect = card.getBoundingClientRect();
-        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-          return node;
-        }
-      }
-      return null;
-    }
-
-    function returnTermToCenter(termCard) {
-      const termsCenter = document.getElementById('termsCenter');
-      termCard.classList.remove('docked', 'correct', 'incorrect', 'dragging');
-      termCard.draggable = true;
-      termsCenter.appendChild(termCard);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
     }
 
     function updateProgress() {
