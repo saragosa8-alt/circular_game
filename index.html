@@ -422,8 +422,8 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
-  <div class="version-badge">v3.0-snap</div>
-  <!-- Last updated: 2026-01-01 15:00 -->
+  <div class="version-badge">v3.1-fixed</div>
+  <!-- Last updated: 2026-01-01 15:30 -->
   <script>
     const defaultConfig = {
       background_color: '#667eea',
@@ -487,7 +487,7 @@
 
     const pieces = new Map(); // Store piece data and state
     const matchedPairs = new Map(); // Store matched pairs
-    const SNAP_DISTANCE = 150; // Distance in pixels for magnetic snap
+    const SNAP_DISTANCE = 250; // Distance in pixels for magnetic snap (center-to-center)
     const occupiedPositions = []; // Track occupied positions to avoid overlaps
 
     function checkOverlap(x, y, width, height, minDistance = 100) {
@@ -778,10 +778,19 @@
 
       if (!matchingPiece || matchingPiece.matched) return;
 
-      // Calculate distance
+      // Get the center points of both pieces for accurate distance
+      const rect1 = pieceData.element.getBoundingClientRect();
+      const rect2 = matchingPiece.element.getBoundingClientRect();
+
+      const center1X = pieceData.x + rect1.width / 2;
+      const center1Y = pieceData.y + rect1.height / 2;
+      const center2X = matchingPiece.x + rect2.width / 2;
+      const center2Y = matchingPiece.y + rect2.height / 2;
+
+      // Calculate distance between centers
       const distance = Math.sqrt(
-        Math.pow(pieceData.x - matchingPiece.x, 2) +
-        Math.pow(pieceData.y - matchingPiece.y, 2)
+        Math.pow(center1X - center2X, 2) +
+        Math.pow(center1Y - center2Y, 2)
       );
 
       // Show glow if within snap distance
@@ -802,14 +811,26 @@
 
       if (!matchingPiece || matchingPiece.matched) return false;
 
-      // Calculate distance
+      // Get the center points of both pieces for accurate distance
+      const rect1 = pieceData.element.getBoundingClientRect();
+      const rect2 = matchingPiece.element.getBoundingClientRect();
+
+      const center1X = pieceData.x + rect1.width / 2;
+      const center1Y = pieceData.y + rect1.height / 2;
+      const center2X = matchingPiece.x + rect2.width / 2;
+      const center2Y = matchingPiece.y + rect2.height / 2;
+
+      // Calculate distance between centers
       const distance = Math.sqrt(
-        Math.pow(pieceData.x - matchingPiece.x, 2) +
-        Math.pow(pieceData.y - matchingPiece.y, 2)
+        Math.pow(center1X - center2X, 2) +
+        Math.pow(center1Y - center2Y, 2)
       );
+
+      console.log(`Attempting match for ${pieceData.type} #${pieceData.id}: distance = ${distance.toFixed(2)}px (snap at ${SNAP_DISTANCE}px)`);
 
       // If within snap distance, connect them
       if (distance < SNAP_DISTANCE) {
+        console.log('✓ Match found! Snapping pieces together...');
         // Snap pieces together with animation
         snapPiecesTogether(pieceData, matchingPiece);
         return true;
@@ -1055,10 +1076,16 @@
       if (!currentDrag) return;
 
       currentDrag.piece.classList.remove('dragging');
+      currentDrag.piece.style.zIndex = '10';
 
       // Check if close enough to match
       if (!currentDrag.isDraggingPair) {
-        attemptMatch(currentDrag.pieceData);
+        const matched = attemptMatch(currentDrag.pieceData);
+
+        // If no match, check for overlaps and reposition if needed
+        if (!matched) {
+          resolveOverlap(currentDrag.pieceData);
+        }
       }
 
       // Clear in-range highlights
