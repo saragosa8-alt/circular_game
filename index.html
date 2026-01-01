@@ -1,329 +1,296 @@
-<!doctype html>
-<html lang="en" class="h-full">
- <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Socket Matching Game</title>
-  <script src="/_sdk/element_sdk.js"></script>
+  <title>Match the Terms - Puzzle Game</title>
   <style>
-    :root {
-      --orbit-radius: clamp(200px, 40vmin, 320px);
-      --definition-width: clamp(120px, 18vw, 160px);
-      --definition-height: clamp(70px, 12vh, 90px);
-      --term-font-size: clamp(10px, 1.5vw, 13px);
-      --definition-font-size: clamp(9px, 1.3vw, 12px);
-      --center-size: clamp(25%, 28vmin, 32%);
-      --gap-size: clamp(3px, 0.5vw, 6px);
-    }
-
-    body {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      overflow: auto;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .app-wrapper {
-      min-height: 100%;
-      width: 100%;
+      min-height: 100vh;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      background-size: 200% 200%;
-      animation: gradient-shift 15s ease infinite;
-      padding: clamp(16px, 3vw, 24px);
-    }
-
-    @keyframes gradient-shift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+      padding: 20px;
     }
 
     .game-container {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .game-title {
-      font-size: 36px;
+      font-size: clamp(24px, 5vw, 36px);
       font-weight: 700;
       color: white;
-      margin: 0 0 12px 0;
+      margin-bottom: 8px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
 
     .instructions {
-      font-size: 16px;
-      color: rgba(255,255,255,0.95);
-      margin: 0;
+      font-size: clamp(14px, 2.5vw, 16px);
+      color: rgba(255,255,255,0.9);
     }
 
-    .progress-container {
-      background: rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 48px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+    /* Progress & Matched Area */
+    .progress-section {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
     .progress-label {
       color: white;
-      font-size: 14px;
       font-weight: 600;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      font-size: 14px;
+    }
+
+    .progress-count {
+      color: rgba(255,255,255,0.9);
+      font-weight: 600;
+      font-size: 14px;
     }
 
     .progress-bar-bg {
       background: rgba(0,0,0,0.2);
-      border-radius: 8px;
-      height: 12px;
+      border-radius: 10px;
+      height: 10px;
       overflow: hidden;
+      margin-bottom: 16px;
     }
 
     .progress-bar-fill {
       background: linear-gradient(90deg, #10b981, #34d399);
       height: 100%;
-      border-radius: 8px;
-      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 10px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       width: 0%;
     }
 
+    /* Matched Pairs Collection Area */
+    .matched-area {
+      min-height: 60px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      border: 2px dashed rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .matched-area:empty::before {
+      content: 'Matched pairs will appear here...';
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .matched-area:not(:empty) {
+      border-color: rgba(139, 92, 246, 0.4);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    /* Matched Pair Group */
+    .matched-pair-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.95);
+      padding: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .matched-pair-group .term-text {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .matched-pair-group .equals {
+      color: #8b5cf6;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .matched-pair-group .def-text {
+      color: #4b5563;
+      font-size: 11px;
+      line-height: 1.3;
+      max-width: 180px;
+    }
+
+    /* Play Area */
     .play-area {
       position: relative;
-      width: 95vw;
-      height: 70vh;
-      max-width: 1400px;
-      min-height: 500px;
-      margin: 0 auto;
+      width: 100%;
+      height: 55vh;
+      min-height: 400px;
+      max-height: 600px;
       background: rgba(255,255,255,0.05);
-      border-radius: 24px;
-      border: 2px dashed rgba(255,255,255,0.1);
-      overflow: visible;
+      border-radius: 20px;
+      border: 2px dashed rgba(255,255,255,0.15);
+      overflow: hidden;
     }
 
-    @media (max-width: 1024px) {
-      .play-area {
-        height: 65vh;
-        min-height: 450px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .play-area {
-        height: 60vh;
-        min-height: 400px;
-        width: 98vw;
-      }
-    }
-
+    /* Game Pieces */
     .game-piece {
       position: absolute;
       cursor: grab;
       user-select: none;
-      transition: all 0.3s ease;
-      transform-origin: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       z-index: 10;
     }
 
-    .game-piece:active {
-      cursor: grabbing;
-      z-index: 1000;
+    .game-piece:hover {
+      z-index: 100;
     }
 
     .game-piece.dragging {
-      opacity: 0.8;
       cursor: grabbing;
-      transform: scale(1.05);
       z-index: 1000;
+      transform: scale(1.08) rotate(0deg) !important;
     }
 
-    .game-piece.in-range {
-      animation: glow-pulse 1s ease-in-out infinite;
+    /* Proximity Glow - triggers for ANY nearby piece */
+    .game-piece.in-proximity {
+      animation: proximityGlow 0.8s ease-in-out infinite;
     }
 
-    @keyframes glow-pulse {
+    @keyframes proximityGlow {
       0%, 100% {
-        box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.7),
+                    0 0 40px rgba(251, 191, 36, 0.4),
+                    0 4px 12px rgba(0,0,0,0.15);
       }
       50% {
-        box-shadow: 0 0 35px rgba(251, 191, 36, 0.9), 0 6px 16px rgba(0,0,0,0.2);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.9),
+                    0 0 60px rgba(251, 191, 36, 0.5),
+                    0 6px 16px rgba(0,0,0,0.2);
       }
     }
 
+    /* Term Card */
+    .term-card {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      white-space: nowrap;
+    }
+
+    .term-card:hover {
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    /* Definition Card */
     .definition-card {
       background: rgba(255,255,255,0.95);
       color: #1f2937;
       padding: 14px 18px;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.45;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      width: 200px;
-      min-height: 70px;
-      max-height: 90px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      cursor: grab !important;
+      width: 180px;
+      max-width: 200px;
       font-weight: 500;
-      pointer-events: auto;
     }
 
     .definition-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }
 
-    .definition-card:active {
-      cursor: grabbing !important;
+    /* Wrong match shake */
+    .game-piece.wrong-match {
+      animation: wrongShake 0.5s ease;
     }
 
-    .game-piece.matched {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(255,255,255,0.95) 100%);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(0,0,0,0.15);
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0) rotate(var(--rotation, 0deg)); }
+      20% { transform: translateX(-8px) rotate(calc(var(--rotation, 0deg) - 3deg)); }
+      40% { transform: translateX(8px) rotate(calc(var(--rotation, 0deg) + 3deg)); }
+      60% { transform: translateX(-6px) rotate(calc(var(--rotation, 0deg) - 2deg)); }
+      80% { transform: translateX(6px) rotate(calc(var(--rotation, 0deg) + 2deg)); }
     }
 
-    .term-card {
-      background: #3b82f6;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: grab;
-      user-select: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      border: 2px solid transparent;
-      white-space: normal;
-      word-wrap: break-word;
-      max-width: 140px;
-      text-align: center;
-      line-height: 1.3;
-      position: relative;
+    /* Correct match celebration */
+    .game-piece.correct-match {
+      animation: correctPop 0.4s ease;
     }
 
-    .term-card:active {
-      cursor: grabbing;
-    }
-
-    .term-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-    }
-
-    .matched-pair {
-      position: relative;
-    }
-
-    .connector-line {
-      position: absolute;
-      background: linear-gradient(90deg, #8b5cf6, #a78bfa);
-      height: 4px;
-      transform-origin: left center;
-      pointer-events: none;
-      z-index: 1;
-      border-radius: 2px;
-      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-    }
-
-    .connector-tab {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: #8b5cf6;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
-      pointer-events: none;
-      z-index: 2;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-
-    @keyframes snap-animation {
+    @keyframes correctPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
 
-    .game-piece.snapping {
-      animation: snap-animation 0.4s ease;
+    /* Flying to collection */
+    .game-piece.flying {
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2000;
     }
 
-    .version-badge {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 9999;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .game-title {
-        font-size: clamp(24px, 5vw, 32px);
-      }
-
-      .instructions {
-        font-size: clamp(13px, 2.5vw, 15px);
-      }
-
-      .progress-container {
-        margin-bottom: clamp(24px, 5vw, 36px);
-      }
-    }
-
-    @media (max-width: 480px) {
-      :root {
-        --center-size: clamp(30%, 35vmin, 40%);
-      }
-
-      .progress-container {
-        margin-bottom: clamp(20px, 4vw, 28px);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .definition-node,
-      .term-card,
-      .circle-background,
-      .app-wrapper {
-        animation: none;
-      }
-    }
-
+    /* Success Modal */
     .success-modal {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 10000;
-      backdrop-filter: blur(4px);
     }
 
     .success-modal.show {
@@ -338,107 +305,148 @@
 
     .success-content {
       background: white;
-      padding: 48px;
+      padding: 40px 50px;
       border-radius: 24px;
       text-align: center;
-      max-width: 500px;
-      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 420px;
+      margin: 20px;
+      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.3);
     }
 
     @keyframes slideUp {
       from {
-        transform: translateY(50px);
+        transform: translateY(40px) scale(0.95);
         opacity: 0;
       }
       to {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
         opacity: 1;
       }
     }
 
     .success-icon {
-      font-size: 72px;
-      margin-bottom: 24px;
+      font-size: 64px;
+      margin-bottom: 16px;
     }
 
     .success-title {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 700;
       color: #10b981;
-      margin: 0 0 16px 0;
+      margin-bottom: 12px;
     }
 
     .success-message {
-      font-size: 18px;
+      font-size: 16px;
       color: #6b7280;
-      margin: 0 0 32px 0;
+      margin-bottom: 28px;
+      line-height: 1.5;
     }
 
     .reset-button {
-      background: #667eea;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      padding: 14px 32px;
+      padding: 14px 36px;
       border: none;
       border-radius: 12px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
     .reset-button:hover {
-      background: #5568d3;
       transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-wrapper {
+        padding: 12px;
+      }
+
+      .play-area {
+        height: 50vh;
+        min-height: 350px;
+      }
+
+      .term-card {
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+
+      .definition-card {
+        width: 150px;
+        padding: 12px 14px;
+        font-size: 11px;
+      }
+
+      .matched-pair-group {
+        padding: 6px 10px;
+      }
+
+      .matched-pair-group .def-text {
+        max-width: 120px;
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .play-area {
+        height: 45vh;
+        min-height: 300px;
+      }
+
+      .definition-card {
+        width: 130px;
+        padding: 10px 12px;
+        font-size: 10px;
+      }
+
+      .matched-area {
+        gap: 8px;
+        padding: 8px;
+      }
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
- </head>
- <body class="h-full">
+</head>
+<body>
   <div class="app-wrapper">
-   <div class="game-container">
-    <header class="header">
-     <h1 class="game-title" id="gameTitle">Match the Terms</h1>
-     <p class="instructions" id="instructions">Drag terms from the center to their matching definitions</p>
-    </header>
-    <div class="progress-container">
-     <div class="progress-label"><span>Progress</span> <span id="progressText">0/5 Matched</span>
-     </div>
-     <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progressBar"></div>
-     </div>
-    </div>
-    <div class="play-area" id="playArea"></div>
-   </div>
-  </div>
-  <div class="success-modal" id="successModal">
-   <div class="success-content">
-    <div class="success-icon">
-     🎉
-    </div>
-    <h2 class="success-title">Perfect Score!</h2>
-    <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
-   </div>
-  </div>
-  <div class="version-badge">v3.3-selectable</div>
-  <!-- Last updated: 2026-01-01 - Fixed definition piece key lookup -->
-  <script>
-    const defaultConfig = {
-      background_color: '#667eea',
-      surface_color: '#3b82f6',
-      text_color: '#1f2937',
-      primary_action_color: '#ffffff',
-      secondary_action_color: '#8b5cf6',
-      font_family: 'Inter',
-      font_size: 16,
-      game_title: 'Match the Terms',
-      instruction_text: 'Drag pieces near their matches to snap them together',
-      submit_button_text: 'Check Answers',
-      success_message: 'You matched all the terms correctly!'
-    };
+    <div class="game-container">
+      <header class="header">
+        <h1 class="game-title">Match the Terms</h1>
+        <p class="instructions">Drag pieces close together to match them!</p>
+      </header>
 
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Progress</span>
+          <span class="progress-count" id="progressCount">0/5 Matched</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="matched-area" id="matchedArea"></div>
+      </div>
+
+      <div class="play-area" id="playArea"></div>
+    </div>
+  </div>
+
+  <div class="success-modal" id="successModal">
+    <div class="success-content">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">Amazing Job!</h2>
+      <p class="success-message">You matched all the terms correctly! You're a matching master!</p>
+      <button class="reset-button" id="resetButton">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    // Game data
     const gameData = [
       { term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into energy', id: 1 },
       { term: 'Mitochondria', definition: 'The powerhouse of the cell that produces ATP', id: 2 },
@@ -447,182 +455,146 @@
       { term: 'Homeostasis', definition: 'The ability of an organism to maintain stable internal conditions', id: 5 }
     ];
 
+    // Game state
+    const pieces = new Map();
     let matchedCount = 0;
-
-    async function onConfigChange(config) {
-      const finalConfig = { ...defaultConfig, ...config };
-
-      document.querySelector('.app-wrapper').style.background =
-        `linear-gradient(135deg, ${finalConfig.background_color} 0%, ${adjustColorBrightness(finalConfig.background_color, -20)} 100%)`;
-
-      document.getElementById('gameTitle').textContent = finalConfig.game_title;
-      document.getElementById('instructions').textContent = finalConfig.instruction_text;
-      document.getElementById('successMessage').textContent = finalConfig.success_message;
-
-      const customFont = finalConfig.font_family;
-      const baseFont = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-      document.body.style.fontFamily = `${customFont}, ${baseFont}`;
-
-      const baseSize = finalConfig.font_size;
-      document.querySelector('.game-title').style.fontSize = `${baseSize * 2.25}px`;
-      document.querySelector('.instructions').style.fontSize = `${baseSize}px`;
-
-      document.querySelectorAll('.term-card:not(.docked):not(.correct):not(.incorrect)').forEach(card => {
-        card.style.background = finalConfig.surface_color;
-      });
-
-      document.querySelectorAll('.term-card.docked').forEach(card => {
-        card.style.background = finalConfig.secondary_action_color;
-      });
-    }
-
-    function adjustColorBrightness(color, percent) {
-      const num = parseInt(color.replace('#', ''), 16);
-      const amt = Math.round(2.55 * percent);
-      const R = Math.min(255, Math.max(0, (num >> 16) + amt));
-      const G = Math.min(255, Math.max(0, (num >> 8 & 0x00FF) + amt));
-      const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
-      return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
-    }
-
-    const pieces = new Map(); // Store piece data and state
-    const matchedPairs = new Map(); // Store matched pairs
-    const SNAP_DISTANCE = 250; // Distance in pixels for magnetic snap (center-to-center)
-    const occupiedPositions = []; // Track occupied positions to avoid overlaps
-
-    function checkOverlap(x, y, width, height, minDistance = 100) {
-      for (let pos of occupiedPositions) {
-        const dx = x - pos.x;
-        const dy = y - pos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < minDistance) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function getRandomPosition(playArea, pieceWidth, pieceHeight) {
-      const areaWidth = playArea.offsetWidth || 1200;
-      const areaHeight = playArea.offsetHeight || 700;
-
-      const margin = 50;
-      let x, y;
-      let attempts = 0;
-      const maxAttempts = 50;
-
-      // Try to find a non-overlapping position
-      do {
-        x = margin + Math.random() * (areaWidth - pieceWidth - margin * 2);
-        y = margin + Math.random() * (areaHeight - pieceHeight - margin * 2);
-        attempts++;
-      } while (checkOverlap(x, y, pieceWidth, pieceHeight) && attempts < maxAttempts);
-
-      // Store this position
-      occupiedPositions.push({ x, y, width: pieceWidth, height: pieceHeight });
-
-      return { x, y };
-    }
-
-    function getRandomRotation() {
-      return (Math.random() - 0.5) * 30; // ±15 degrees
-    }
-
-    function initializeGame() {
-      const playArea = document.getElementById('playArea');
-      playArea.innerHTML = '';
-      matchedCount = 0;
-      pieces.clear();
-      matchedPairs.clear();
-      occupiedPositions.length = 0; // Clear occupied positions
-
-      // Create all pieces (both terms and definitions) and scatter them randomly
-      gameData.forEach(item => {
-        // Create term piece
-        const termPiece = document.createElement('div');
-        termPiece.className = 'game-piece term-card';
-        termPiece.textContent = item.term;
-        termPiece.dataset.id = item.id;
-        termPiece.dataset.type = 'term';
-
-        const termPos = getRandomPosition(playArea, 150, 50);
-        const termRotation = getRandomRotation();
-        termPiece.style.left = `${termPos.x}px`;
-        termPiece.style.top = `${termPos.y}px`;
-        termPiece.style.transform = `rotate(${termRotation}deg)`;
-
-        pieces.set(`term-${item.id}`, {
-          element: termPiece,
-          id: item.id,
-          type: 'term',
-          x: termPos.x,
-          y: termPos.y,
-          rotation: termRotation,
-          matched: false
-        });
-
-        // Create definition piece
-        const defPiece = document.createElement('div');
-        defPiece.className = 'game-piece definition-card';
-        defPiece.textContent = item.definition;
-        defPiece.dataset.id = item.id;
-        defPiece.dataset.type = 'definition';
-
-        const defPos = getRandomPosition(playArea, 200, 90);
-        const defRotation = getRandomRotation();
-        defPiece.style.left = `${defPos.x}px`;
-        defPiece.style.top = `${defPos.y}px`;
-        defPiece.style.transform = `rotate(${defRotation}deg)`;
-
-        pieces.set(`def-${item.id}`, {
-          element: defPiece,
-          id: item.id,
-          type: 'definition',
-          x: defPos.x,
-          y: defPos.y,
-          rotation: defRotation,
-          matched: false
-        });
-
-        // Add drag event listeners to both
-        [termPiece, defPiece].forEach(piece => {
-          piece.addEventListener('mousedown', handleMouseDown);
-          piece.addEventListener('touchstart', handleTouchStart, { passive: false });
-        });
-
-        playArea.appendChild(termPiece);
-        playArea.appendChild(defPiece);
-      });
-
-      updateProgress();
-    }
-
     let currentDrag = null;
     let dragOffset = { x: 0, y: 0 };
 
-    function handleMouseDown(e) {
-      console.log('CLICKED:', e.currentTarget.className, e.currentTarget.dataset);
-      e.preventDefault();
-      e.stopPropagation();
+    const PROXIMITY_DISTANCE = 120; // Distance for glow effect
+    const SNAP_DISTANCE = 100; // Distance to trigger match attempt
 
-      const piece = e.currentTarget;
+    // Initialize game
+    function initializeGame() {
+      const playArea = document.getElementById('playArea');
+      const matchedArea = document.getElementById('matchedArea');
+      
+      playArea.innerHTML = '';
+      matchedArea.innerHTML = '';
+      pieces.clear();
+      matchedCount = 0;
+      updateProgress();
 
-      // FIX: Convert "definition" to "def" for the lookup key
-      const type = piece.dataset.type;
-      const id = piece.dataset.id;
-      const pieceKey = type === 'definition' ? `def-${id}` : `term-${id}`;
+      const areaRect = playArea.getBoundingClientRect();
+      const positions = generateEdgePositions(areaRect.width, areaRect.height, gameData.length * 2);
 
-      const pieceData = pieces.get(pieceKey);
+      let posIndex = 0;
 
-      if (!pieceData) {
-        console.error('Piece data not found for', pieceKey);
-        return;
+      gameData.forEach(item => {
+        // Create term piece
+        const termEl = createPiece('term', item);
+        const termPos = positions[posIndex++];
+        termEl.style.left = `${termPos.x}px`;
+        termEl.style.top = `${termPos.y}px`;
+        termEl.style.transform = `rotate(${termPos.rotation}deg)`;
+        termEl.style.setProperty('--rotation', `${termPos.rotation}deg`);
+        
+        pieces.set(`term-${item.id}`, {
+          element: termEl,
+          type: 'term',
+          id: item.id,
+          x: termPos.x,
+          y: termPos.y,
+          rotation: termPos.rotation,
+          matched: false
+        });
+
+        playArea.appendChild(termEl);
+
+        // Create definition piece
+        const defEl = createPiece('definition', item);
+        const defPos = positions[posIndex++];
+        defEl.style.left = `${defPos.x}px`;
+        defEl.style.top = `${defPos.y}px`;
+        defEl.style.transform = `rotate(${defPos.rotation}deg)`;
+        defEl.style.setProperty('--rotation', `${defPos.rotation}deg`);
+
+        pieces.set(`def-${item.id}`, {
+          element: defEl,
+          type: 'definition',
+          id: item.id,
+          x: defPos.x,
+          y: defPos.y,
+          rotation: defPos.rotation,
+          matched: false
+        });
+
+        playArea.appendChild(defEl);
+      });
+    }
+
+    // Generate positions biased toward edges
+    function generateEdgePositions(width, height, count) {
+      const positions = [];
+      const margin = 20;
+      const pieceWidth = 180;
+      const pieceHeight = 80;
+
+      // Define edge zones
+      const zones = [
+        { x: [margin, width * 0.3], y: [margin, height * 0.4] }, // top-left
+        { x: [width * 0.35, width * 0.65], y: [margin, height * 0.25] }, // top-center
+        { x: [width * 0.7, width - pieceWidth - margin], y: [margin, height * 0.4] }, // top-right
+        { x: [margin, width * 0.3], y: [height * 0.6, height - pieceHeight - margin] }, // bottom-left
+        { x: [width * 0.35, width * 0.65], y: [height * 0.75, height - pieceHeight - margin] }, // bottom-center
+        { x: [width * 0.7, width - pieceWidth - margin], y: [height * 0.6, height - pieceHeight - margin] }, // bottom-right
+        { x: [margin, width * 0.25], y: [height * 0.35, height * 0.65] }, // left-middle
+        { x: [width * 0.75, width - pieceWidth - margin], y: [height * 0.35, height * 0.65] }, // right-middle
+      ];
+
+      // Shuffle zones
+      const shuffledZones = [...zones].sort(() => Math.random() - 0.5);
+
+      for (let i = 0; i < count; i++) {
+        const zone = shuffledZones[i % shuffledZones.length];
+        
+        let x, y, attempts = 0;
+        do {
+          x = zone.x[0] + Math.random() * (zone.x[1] - zone.x[0]);
+          y = zone.y[0] + Math.random() * (zone.y[1] - zone.y[0]);
+          attempts++;
+        } while (checkOverlap(positions, x, y, 100) && attempts < 20);
+
+        positions.push({
+          x: Math.max(margin, Math.min(x, width - pieceWidth - margin)),
+          y: Math.max(margin, Math.min(y, height - pieceHeight - margin)),
+          rotation: (Math.random() - 0.5) * 20
+        });
       }
 
-      // Check if this piece is part of a matched pair
-      const pairId = pieceData.matched ? pieceData.id : null;
-      const isDraggingPair = pairId !== null;
+      return positions;
+    }
+
+    function checkOverlap(positions, x, y, minDist) {
+      return positions.some(pos => {
+        const dx = pos.x - x;
+        const dy = pos.y - y;
+        return Math.sqrt(dx * dx + dy * dy) < minDist;
+      });
+    }
+
+    // Create a game piece element
+    function createPiece(type, item) {
+      const el = document.createElement('div');
+      el.className = `game-piece ${type}-card`;
+      el.textContent = type === 'term' ? item.term : item.definition;
+      el.dataset.type = type;
+      el.dataset.id = item.id;
+
+      el.addEventListener('mousedown', handleDragStart);
+      el.addEventListener('touchstart', handleTouchStart, { passive: false });
+
+      return el;
+    }
+
+    // Drag handling
+    function handleDragStart(e) {
+      e.preventDefault();
+      const piece = e.currentTarget;
+      const pieceKey = getPieceKey(piece);
+      const pieceData = pieces.get(pieceKey);
+
+      if (!pieceData || pieceData.matched) return;
 
       const rect = piece.getBoundingClientRect();
       const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
@@ -630,22 +602,14 @@
       dragOffset.x = e.clientX - rect.left;
       dragOffset.y = e.clientY - rect.top;
 
-      currentDrag = {
-        piece: piece,
-        pieceKey: pieceKey,
-        pieceData: pieceData,
-        pairId: pairId,
-        isDraggingPair: isDraggingPair
-      };
-
+      currentDrag = { piece, pieceKey, pieceData };
       piece.classList.add('dragging');
-      piece.style.zIndex = '1000';
 
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mousemove', handleDragMove);
+      document.addEventListener('mouseup', handleDragEnd);
     }
 
-    function handleMouseMove(e) {
+    function handleDragMove(e) {
       if (!currentDrag) return;
 
       const playArea = document.getElementById('playArea');
@@ -654,379 +618,49 @@
       const x = e.clientX - areaRect.left - dragOffset.x;
       const y = e.clientY - areaRect.top - dragOffset.y;
 
-      // Update position
       currentDrag.piece.style.left = `${x}px`;
       currentDrag.piece.style.top = `${y}px`;
+      currentDrag.piece.style.transform = 'rotate(0deg) scale(1.08)';
       currentDrag.pieceData.x = x;
       currentDrag.pieceData.y = y;
 
-      // If dragging a matched pair, move both pieces together
-      if (currentDrag.isDraggingPair) {
-        const pair = matchedPairs.get(currentDrag.pairId);
-        if (pair) {
-          const otherPieceKey = currentDrag.pieceKey.startsWith('term-') ? `def-${currentDrag.pairId}` : `term-${currentDrag.pairId}`;
-          const otherPieceData = pieces.get(otherPieceKey);
-
-          // Calculate offset from stored pair position
-          let dx, dy;
-          if (currentDrag.pieceKey.startsWith('term-')) {
-            dx = x - pair.termX;
-            dy = y - pair.termY;
-            otherPieceData.element.style.left = `${pair.defX + dx}px`;
-            otherPieceData.element.style.top = `${pair.defY + dy}px`;
-            otherPieceData.x = pair.defX + dx;
-            otherPieceData.y = pair.defY + dy;
-          } else {
-            dx = x - pair.defX;
-            dy = y - pair.defY;
-            otherPieceData.element.style.left = `${pair.termX + dx}px`;
-            otherPieceData.element.style.top = `${pair.termY + dy}px`;
-            otherPieceData.x = pair.termX + dx;
-            otherPieceData.y = pair.termY + dy;
-          }
-
-          // Update stored pair positions
-          pair.termX = pieces.get(`term-${currentDrag.pairId}`).x;
-          pair.termY = pieces.get(`term-${currentDrag.pairId}`).y;
-          pair.defX = pieces.get(`def-${currentDrag.pairId}`).x;
-          pair.defY = pieces.get(`def-${currentDrag.pairId}`).y;
-
-          updateConnector(currentDrag.pairId);
-        }
-      } else {
-        // Check for potential matches (magnetic snap)
-        checkForPotentialMatches(currentDrag.pieceData);
-      }
+      // Check proximity to ALL other pieces
+      checkProximity(currentDrag.pieceData);
     }
 
-    function handleMouseUp(e) {
+    function handleDragEnd(e) {
       if (!currentDrag) return;
 
       currentDrag.piece.classList.remove('dragging');
-      currentDrag.piece.style.zIndex = '10';
+      const rotation = currentDrag.pieceData.rotation;
+      currentDrag.piece.style.transform = `rotate(${rotation}deg)`;
 
-      // Check if close enough to match
-      if (!currentDrag.isDraggingPair) {
-        const matched = attemptMatch(currentDrag.pieceData);
+      // Attempt match with closest piece
+      attemptMatch(currentDrag.pieceData);
 
-        // If no match, check for overlaps and reposition if needed
-        if (!matched) {
-          resolveOverlap(currentDrag.pieceData);
-        }
-      }
-
-      // Clear in-range highlights
-      document.querySelectorAll('.in-range').forEach(el => el.classList.remove('in-range'));
+      // Clear all proximity highlights
+      clearProximityHighlights();
 
       currentDrag = null;
-
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleDragMove);
+      document.removeEventListener('mouseup', handleDragEnd);
     }
 
-    function resolveOverlap(pieceData) {
-      const piece = pieceData.element;
-      const rect = piece.getBoundingClientRect();
-
-      // Check if this piece overlaps with any other piece
-      pieces.forEach((otherData, otherKey) => {
-        if (otherData === pieceData) return;
-
-        const otherRect = otherData.element.getBoundingClientRect();
-
-        // Check for overlap
-        const overlap = !(rect.right < otherRect.left ||
-                         rect.left > otherRect.right ||
-                         rect.bottom < otherRect.top ||
-                         rect.top > otherRect.bottom);
-
-        if (overlap) {
-          // Move the piece to a nearby non-overlapping position
-          const playArea = document.getElementById('playArea');
-          const areaRect = playArea.getBoundingClientRect();
-
-          // Try to move it to the right first
-          let newX = otherData.x + otherRect.width + 20;
-          let newY = pieceData.y;
-
-          // If that goes off screen, try below
-          if (newX + rect.width > areaRect.width) {
-            newX = pieceData.x;
-            newY = otherData.y + otherRect.height + 20;
-          }
-
-          // If that also goes off screen, try left
-          if (newY + rect.height > areaRect.height) {
-            newX = Math.max(20, otherData.x - rect.width - 20);
-            newY = pieceData.y;
-          }
-
-          // Apply new position with animation
-          piece.style.transition = 'all 0.3s ease';
-          piece.style.left = `${newX}px`;
-          piece.style.top = `${newY}px`;
-          pieceData.x = newX;
-          pieceData.y = newY;
-
-          // Reset transition after animation
-          setTimeout(() => {
-            piece.style.transition = 'all 0.3s ease';
-          }, 300);
-        }
-      });
-    }
-
-    function checkForPotentialMatches(pieceData) {
-      // Find the matching piece
-      const otherType = pieceData.type === 'term' ? 'definition' : 'term';
-      const matchingPieceKey = `${otherType}-${pieceData.id}`;
-      const matchingPiece = pieces.get(matchingPieceKey);
-
-      if (!matchingPiece || matchingPiece.matched) return;
-
-      // Use getBoundingClientRect for BOTH pieces consistently
-      const rect1 = pieceData.element.getBoundingClientRect();
-      const rect2 = matchingPiece.element.getBoundingClientRect();
-
-      // Calculate centers from viewport coordinates (consistent system)
-      const center1X = rect1.left + rect1.width / 2;
-      const center1Y = rect1.top + rect1.height / 2;
-      const center2X = rect2.left + rect2.width / 2;
-      const center2Y = rect2.top + rect2.height / 2;
-
-      // Calculate distance between centers
-      const distance = Math.sqrt(
-        Math.pow(center1X - center2X, 2) +
-        Math.pow(center1Y - center2Y, 2)
-      );
-
-      // Show glow if within snap distance
-      if (distance < SNAP_DISTANCE) {
-        pieceData.element.classList.add('in-range');
-        matchingPiece.element.classList.add('in-range');
-      } else {
-        pieceData.element.classList.remove('in-range');
-        matchingPiece.element.classList.remove('in-range');
-      }
-    }
-
-    function attemptMatch(pieceData) {
-      // Find the matching piece
-      const otherType = pieceData.type === 'term' ? 'definition' : 'term';
-      const matchingPieceKey = `${otherType}-${pieceData.id}`;
-      const matchingPiece = pieces.get(matchingPieceKey);
-
-      if (!matchingPiece || matchingPiece.matched) return false;
-
-      // Use consistent viewport coordinates
-      const rect1 = pieceData.element.getBoundingClientRect();
-      const rect2 = matchingPiece.element.getBoundingClientRect();
-
-      const center1X = rect1.left + rect1.width / 2;
-      const center1Y = rect1.top + rect1.height / 2;
-      const center2X = rect2.left + rect2.width / 2;
-      const center2Y = rect2.top + rect2.height / 2;
-
-      // Calculate distance between centers
-      const distance = Math.sqrt(
-        Math.pow(center1X - center2X, 2) +
-        Math.pow(center1Y - center2Y, 2)
-      );
-
-      console.log(`Attempting match for ${pieceData.type} #${pieceData.id}: distance = ${distance.toFixed(2)}px (snap at ${SNAP_DISTANCE}px)`);
-
-      // If within snap distance, connect them
-      if (distance < SNAP_DISTANCE) {
-        console.log('✓ Match found! Snapping pieces together...');
-        // Snap pieces together with animation
-        snapPiecesTogether(pieceData, matchingPiece);
-        return true;
-      }
-
-      return false;
-    }
-
-    function snapPiecesTogether(piece1, piece2) {
-      // Determine which is term and which is definition
-      const termPiece = piece1.type === 'term' ? piece1 : piece2;
-      const defPiece = piece1.type === 'definition' ? piece1 : piece2;
-
-      // Calculate midpoint
-      const midX = (termPiece.x + defPiece.x) / 2;
-      const midY = (termPiece.y + defPiece.y) / 2;
-
-      // Position term to the left, definition to the right
-      const gap = 30;
-      const termRect = termPiece.element.getBoundingClientRect();
-      const defRect = defPiece.element.getBoundingClientRect();
-
-      const newTermX = midX - termRect.width / 2 - gap / 2;
-      const newTermY = midY - termRect.height / 2;
-      const newDefX = midX + defRect.width / 2 + gap / 2;
-      const newDefY = midY - defRect.height / 2;
-
-      // Animate the snap
-      termPiece.element.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      defPiece.element.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-
-      termPiece.element.style.left = `${newTermX}px`;
-      termPiece.element.style.top = `${newTermY}px`;
-      defPiece.element.style.left = `${newDefX}px`;
-      defPiece.element.style.top = `${newDefY}px`;
-
-      termPiece.x = newTermX;
-      termPiece.y = newTermY;
-      defPiece.x = newDefX;
-      defPiece.y = newDefY;
-
-      // Reset transitions and create match
-      setTimeout(() => {
-        termPiece.element.style.transition = 'all 0.3s ease';
-        defPiece.element.style.transition = 'all 0.3s ease';
-        createMatch(termPiece.id);
-      }, 400);
-    }
-
-    function createMatch(id) {
-      const termPiece = pieces.get(`term-${id}`);
-      const defPiece = pieces.get(`def-${id}`);
-
-      // Mark as matched
-      termPiece.matched = true;
-      defPiece.matched = true;
-
-      // Add visual feedback
-      termPiece.element.classList.add('matched', 'snapping');
-      defPiece.element.classList.add('matched', 'snapping');
-      termPiece.element.classList.remove('in-range');
-      defPiece.element.classList.remove('in-range');
-
-      // Store matched pair position
-      matchedPairs.set(id, {
-        termX: termPiece.x,
-        termY: termPiece.y,
-        defX: defPiece.x,
-        defY: defPiece.y
-      });
-
-      // Create connector visual
-      createConnector(id);
-
-      matchedCount++;
-      updateProgress();
-
-      // Remove snap animation class
-      setTimeout(() => {
-        termPiece.element.classList.remove('snapping');
-        defPiece.element.classList.remove('snapping');
-      }, 400);
-
-      // Check if all matched
-      if (matchedCount === gameData.length) {
-        setTimeout(() => {
-          document.getElementById('successModal').classList.add('show');
-        }, 600);
-      }
-    }
-
-    function createConnector(id) {
-      const termPiece = pieces.get(`term-${id}`);
-      const defPiece = pieces.get(`def-${id}`);
-
-      // Create connector line
-      const line = document.createElement('div');
-      line.className = 'connector-line';
-      line.id = `connector-${id}`;
-
-      // Create connector tabs (circles at connection points)
-      const tab1 = document.createElement('div');
-      tab1.className = 'connector-tab';
-      tab1.id = `tab1-${id}`;
-
-      const tab2 = document.createElement('div');
-      tab2.className = 'connector-tab';
-      tab2.id = `tab2-${id}`;
-
-      const playArea = document.getElementById('playArea');
-      playArea.appendChild(line);
-      playArea.appendChild(tab1);
-      playArea.appendChild(tab2);
-
-      updateConnector(id);
-    }
-
-    function updateConnector(id) {
-      const termPiece = pieces.get(`term-${id}`);
-      const defPiece = pieces.get(`def-${id}`);
-
-      if (!termPiece || !defPiece) return;
-
-      const line = document.getElementById(`connector-${id}`);
-      const tab1 = document.getElementById(`tab1-${id}`);
-      const tab2 = document.getElementById(`tab2-${id}`);
-
-      if (!line || !tab1 || !tab2) return;
-
-      // Get centers of pieces using their stored positions and actual dimensions
-      const termRect = termPiece.element.getBoundingClientRect();
-      const defRect = defPiece.element.getBoundingClientRect();
-
-      const termCenterX = termPiece.x + termRect.width / 2;
-      const termCenterY = termPiece.y + termRect.height / 2;
-      const defCenterX = defPiece.x + defRect.width / 2;
-      const defCenterY = defPiece.y + defRect.height / 2;
-
-      // Calculate line position and angle
-      const dx = defCenterX - termCenterX;
-      const dy = defCenterY - termCenterY;
-      const length = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-      line.style.left = `${termCenterX}px`;
-      line.style.top = `${termCenterY}px`;
-      line.style.width = `${length}px`;
-      line.style.transform = `rotate(${angle}deg)`;
-
-      // Position tabs (centered on the connector endpoints)
-      tab1.style.left = `${termCenterX - 8}px`;
-      tab1.style.top = `${termCenterY - 8}px`;
-      tab2.style.left = `${defCenterX - 8}px`;
-      tab2.style.top = `${defCenterY - 8}px`;
-    }
-
+    // Touch handling
     function handleTouchStart(e) {
       e.preventDefault();
+      const touch = e.touches[0];
       const piece = e.currentTarget;
-
-      // FIX: Convert "definition" to "def" for the lookup key
-      const type = piece.dataset.type;
-      const id = piece.dataset.id;
-      const pieceKey = type === 'definition' ? `def-${id}` : `term-${id}`;
-
+      const pieceKey = getPieceKey(piece);
       const pieceData = pieces.get(pieceKey);
 
-      if (!pieceData) {
-        console.error('Piece data not found for', pieceKey);
-        return;
-      }
+      if (!pieceData || pieceData.matched) return;
 
-      // Check if this piece is part of a matched pair
-      const pairId = pieceData.matched ? pieceData.id : null;
-      const isDraggingPair = pairId !== null;
-
-      const touch = e.touches[0];
       const rect = piece.getBoundingClientRect();
       dragOffset.x = touch.clientX - rect.left;
       dragOffset.y = touch.clientY - rect.top;
 
-      currentDrag = {
-        piece: piece,
-        pieceKey: pieceKey,
-        pieceData: pieceData,
-        pairId: pairId,
-        isDraggingPair: isDraggingPair
-      };
-
+      currentDrag = { piece, pieceKey, pieceData };
       piece.classList.add('dragging');
 
       document.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -1044,166 +678,242 @@
       const x = touch.clientX - areaRect.left - dragOffset.x;
       const y = touch.clientY - areaRect.top - dragOffset.y;
 
-      // Update position
       currentDrag.piece.style.left = `${x}px`;
       currentDrag.piece.style.top = `${y}px`;
+      currentDrag.piece.style.transform = 'rotate(0deg) scale(1.08)';
       currentDrag.pieceData.x = x;
       currentDrag.pieceData.y = y;
 
-      // If dragging a matched pair, move both pieces together
-      if (currentDrag.isDraggingPair) {
-        const pair = matchedPairs.get(currentDrag.pairId);
-        if (pair) {
-          const otherPieceKey = currentDrag.pieceKey.startsWith('term-') ? `def-${currentDrag.pairId}` : `term-${currentDrag.pairId}`;
-          const otherPieceData = pieces.get(otherPieceKey);
-
-          // Calculate offset from stored pair position
-          let dx, dy;
-          if (currentDrag.pieceKey.startsWith('term-')) {
-            dx = x - pair.termX;
-            dy = y - pair.termY;
-            otherPieceData.element.style.left = `${pair.defX + dx}px`;
-            otherPieceData.element.style.top = `${pair.defY + dy}px`;
-            otherPieceData.x = pair.defX + dx;
-            otherPieceData.y = pair.defY + dy;
-          } else {
-            dx = x - pair.defX;
-            dy = y - pair.defY;
-            otherPieceData.element.style.left = `${pair.termX + dx}px`;
-            otherPieceData.element.style.top = `${pair.termY + dy}px`;
-            otherPieceData.x = pair.termX + dx;
-            otherPieceData.y = pair.termY + dy;
-          }
-
-          // Update stored pair positions
-          pair.termX = pieces.get(`term-${currentDrag.pairId}`).x;
-          pair.termY = pieces.get(`term-${currentDrag.pairId}`).y;
-          pair.defX = pieces.get(`def-${currentDrag.pairId}`).x;
-          pair.defY = pieces.get(`def-${currentDrag.pairId}`).y;
-
-          updateConnector(currentDrag.pairId);
-        }
-      } else {
-        // Check for potential matches (magnetic snap)
-        checkForPotentialMatches(currentDrag.pieceData);
-      }
+      checkProximity(currentDrag.pieceData);
     }
 
     function handleTouchEnd(e) {
       if (!currentDrag) return;
 
       currentDrag.piece.classList.remove('dragging');
-      currentDrag.piece.style.zIndex = '10';
+      const rotation = currentDrag.pieceData.rotation;
+      currentDrag.piece.style.transform = `rotate(${rotation}deg)`;
 
-      // Check if close enough to match
-      if (!currentDrag.isDraggingPair) {
-        const matched = attemptMatch(currentDrag.pieceData);
-
-        // If no match, check for overlaps and reposition if needed
-        if (!matched) {
-          resolveOverlap(currentDrag.pieceData);
-        }
-      }
-
-      // Clear in-range highlights
-      document.querySelectorAll('.in-range').forEach(el => el.classList.remove('in-range'));
+      attemptMatch(currentDrag.pieceData);
+      clearProximityHighlights();
 
       currentDrag = null;
-
       document.removeEventListener('touchmove', handleTouchMove);
       document.removeEventListener('touchend', handleTouchEnd);
     }
 
-    function updateProgress() {
-      const total = gameData.length;
-      const percentage = (matchedCount / total) * 100;
-
-      document.getElementById('progressBar').style.width = `${percentage}%`;
-      document.getElementById('progressText').textContent = `${matchedCount}/${total} Matched`;
+    // Helper to get piece key
+    function getPieceKey(element) {
+      const type = element.dataset.type;
+      const id = element.dataset.id;
+      return type === 'definition' ? `def-${id}` : `term-${id}`;
     }
 
-    function resetGame() {
-      document.getElementById('successModal').classList.remove('show');
-      initializeGame();
-      // Debug: verify all pieces have listeners
-      setTimeout(() => {
-        console.log('Pieces registered:', pieces.size);
-        pieces.forEach((data, key) => {
-          console.log(key, data.element.className);
-        });
-      }, 100);
-    }
+    // Check proximity to ALL other unmatched pieces
+    function checkProximity(draggedPiece) {
+      clearProximityHighlights();
 
-    document.getElementById('resetButton').addEventListener('click', resetGame);
+      const draggedCenter = getPieceCenter(draggedPiece);
 
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities: (config) => ({
-          recolorables: [
-            {
-              get: () => config.background_color || defaultConfig.background_color,
-              set: (value) => {
-                config.background_color = value;
-                window.elementSdk.setConfig({ background_color: value });
-              }
-            },
-            {
-              get: () => config.surface_color || defaultConfig.surface_color,
-              set: (value) => {
-                config.surface_color = value;
-                window.elementSdk.setConfig({ surface_color: value });
-              }
-            },
-            {
-              get: () => config.text_color || defaultConfig.text_color,
-              set: (value) => {
-                config.text_color = value;
-                window.elementSdk.setConfig({ text_color: value });
-              }
-            },
-            {
-              get: () => config.primary_action_color || defaultConfig.primary_action_color,
-              set: (value) => {
-                config.primary_action_color = value;
-                window.elementSdk.setConfig({ primary_action_color: value });
-              }
-            },
-            {
-              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
-              set: (value) => {
-                config.secondary_action_color = value;
-                window.elementSdk.setConfig({ secondary_action_color: value });
-              }
-            }
-          ],
-          borderables: [],
-          fontEditable: {
-            get: () => config.font_family || defaultConfig.font_family,
-            set: (value) => {
-              config.font_family = value;
-              window.elementSdk.setConfig({ font_family: value });
-            }
-          },
-          fontSizeable: {
-            get: () => config.font_size || defaultConfig.font_size,
-            set: (value) => {
-              config.font_size = value;
-              window.elementSdk.setConfig({ font_size: value });
-            }
-          }
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ['game_title', config.game_title || defaultConfig.game_title],
-          ['instruction_text', config.instruction_text || defaultConfig.instruction_text],
-          ['submit_button_text', config.submit_button_text || defaultConfig.submit_button_text],
-          ['success_message', config.success_message || defaultConfig.success_message]
-        ])
+      pieces.forEach((otherPiece, key) => {
+        if (otherPiece === draggedPiece || otherPiece.matched) return;
+
+        const otherCenter = getPieceCenter(otherPiece);
+        const distance = getDistance(draggedCenter, otherCenter);
+
+        if (distance < PROXIMITY_DISTANCE) {
+          draggedPiece.element.classList.add('in-proximity');
+          otherPiece.element.classList.add('in-proximity');
+        }
       });
     }
 
+    function clearProximityHighlights() {
+      document.querySelectorAll('.in-proximity').forEach(el => {
+        el.classList.remove('in-proximity');
+      });
+    }
+
+    // Get center of piece
+    function getPieceCenter(pieceData) {
+      const rect = pieceData.element.getBoundingClientRect();
+      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
+      return {
+        x: pieceData.x + rect.width / 2,
+        y: pieceData.y + rect.height / 2
+      };
+    }
+
+    function getDistance(p1, p2) {
+      return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+    }
+
+    // Attempt match
+    function attemptMatch(draggedPiece) {
+      const draggedCenter = getPieceCenter(draggedPiece);
+      let closestPiece = null;
+      let closestDistance = Infinity;
+
+      // Find closest unmatched piece
+      pieces.forEach((otherPiece, key) => {
+        if (otherPiece === draggedPiece || otherPiece.matched) return;
+
+        const otherCenter = getPieceCenter(otherPiece);
+        const distance = getDistance(draggedCenter, otherCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestPiece = otherPiece;
+        }
+      });
+
+      if (!closestPiece || closestDistance > SNAP_DISTANCE) return;
+
+      // Check if it's the correct match
+      const isCorrectMatch = draggedPiece.id === closestPiece.id && 
+                             draggedPiece.type !== closestPiece.type;
+
+      if (isCorrectMatch) {
+        handleCorrectMatch(draggedPiece, closestPiece);
+      } else {
+        handleWrongMatch(draggedPiece, closestPiece);
+      }
+    }
+
+    // Handle correct match
+    function handleCorrectMatch(piece1, piece2) {
+      // Add celebration effect
+      piece1.element.classList.add('correct-match');
+      piece2.element.classList.add('correct-match');
+
+      // Mark as matched
+      piece1.matched = true;
+      piece2.matched = true;
+
+      // Get the term and definition
+      const termPiece = piece1.type === 'term' ? piece1 : piece2;
+      const defPiece = piece1.type === 'definition' ? piece1 : piece2;
+      const itemData = gameData.find(d => d.id === piece1.id);
+
+      // Fly to matched area
+      setTimeout(() => {
+        flyToMatchedArea(termPiece.element, defPiece.element, itemData);
+      }, 300);
+    }
+
+    // Fly pieces to matched area
+    function flyToMatchedArea(termEl, defEl, itemData) {
+      const matchedArea = document.getElementById('matchedArea');
+      const areaRect = matchedArea.getBoundingClientRect();
+      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
+
+      // Calculate target position (center of matched area)
+      const targetX = areaRect.left - playAreaRect.left + areaRect.width / 2;
+      const targetY = areaRect.top - playAreaRect.top - 50;
+
+      // Animate both pieces flying up
+      [termEl, defEl].forEach(el => {
+        el.classList.add('flying');
+        el.style.left = `${targetX}px`;
+        el.style.top = `${targetY}px`;
+        el.style.transform = 'scale(0.5) rotate(0deg)';
+        el.style.opacity = '0';
+      });
+
+      // After animation, create matched group in collection
+      setTimeout(() => {
+        termEl.remove();
+        defEl.remove();
+
+        const group = document.createElement('div');
+        group.className = 'matched-pair-group';
+        group.innerHTML = `
+          <span class="term-text">${itemData.term}</span>
+          <span class="equals">=</span>
+          <span class="def-text">${itemData.definition}</span>
+        `;
+        matchedArea.appendChild(group);
+
+        matchedCount++;
+        updateProgress();
+
+        // Check for win
+        if (matchedCount === gameData.length) {
+          setTimeout(() => {
+            document.getElementById('successModal').classList.add('show');
+          }, 500);
+        }
+      }, 600);
+    }
+
+    // Handle wrong match
+    function handleWrongMatch(piece1, piece2) {
+      piece1.element.classList.add('wrong-match');
+      piece2.element.classList.add('wrong-match');
+
+      // Repel pieces apart
+      const center1 = getPieceCenter(piece1);
+      const center2 = getPieceCenter(piece2);
+      
+      const dx = center2.x - center1.x;
+      const dy = center2.y - center1.y;
+      const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+      
+      const repelForce = 60;
+      const repelX = (dx / distance) * repelForce;
+      const repelY = (dy / distance) * repelForce;
+
+      // Move pieces apart
+      piece1.element.style.transition = 'left 0.3s ease, top 0.3s ease';
+      piece2.element.style.transition = 'left 0.3s ease, top 0.3s ease';
+
+      piece1.x -= repelX;
+      piece1.y -= repelY;
+      piece2.x += repelX;
+      piece2.y += repelY;
+
+      // Keep within bounds
+      const playArea = document.getElementById('playArea');
+      const bounds = { width: playArea.offsetWidth - 180, height: playArea.offsetHeight - 80 };
+      
+      piece1.x = Math.max(10, Math.min(piece1.x, bounds.width));
+      piece1.y = Math.max(10, Math.min(piece1.y, bounds.height));
+      piece2.x = Math.max(10, Math.min(piece2.x, bounds.width));
+      piece2.y = Math.max(10, Math.min(piece2.y, bounds.height));
+
+      piece1.element.style.left = `${piece1.x}px`;
+      piece1.element.style.top = `${piece1.y}px`;
+      piece2.element.style.left = `${piece2.x}px`;
+      piece2.element.style.top = `${piece2.y}px`;
+
+      // Remove shake class after animation
+      setTimeout(() => {
+        piece1.element.classList.remove('wrong-match');
+        piece2.element.classList.remove('wrong-match');
+        piece1.element.style.transition = '';
+        piece2.element.style.transition = '';
+      }, 500);
+    }
+
+    // Update progress
+    function updateProgress() {
+      const total = gameData.length;
+      const percentage = (matchedCount / total) * 100;
+      document.getElementById('progressBar').style.width = `${percentage}%`;
+      document.getElementById('progressCount').textContent = `${matchedCount}/${total} Matched`;
+    }
+
+    // Reset game
+    function resetGame() {
+      document.getElementById('successModal').classList.remove('show');
+      initializeGame();
+    }
+
+    // Event listeners
+    document.getElementById('resetButton').addEventListener('click', resetGame);
+
+    // Start game
     initializeGame();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b696c59c5696e29',t:'MTc2NzE4MDQwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
