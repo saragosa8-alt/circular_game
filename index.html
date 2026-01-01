@@ -238,6 +238,21 @@
       animation: snap-animation 0.4s ease;
     }
 
+    .version-badge {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
     @media (max-width: 768px) {
       .game-title {
         font-size: clamp(24px, 5vw, 32px);
@@ -381,6 +396,7 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
+  <div class="version-badge">v2.1-scatter</div>
   <script>
     const defaultConfig = {
       background_color: '#667eea',
