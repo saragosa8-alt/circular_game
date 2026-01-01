@@ -695,7 +695,110 @@
         justify-content: center;
       }
     }
+
+    /* File Upload Styles */
+    .file-upload-wrapper {
+      display: inline-block;
+      position: relative;
+    }
+
+    .file-upload-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.95);
+      color: #1f2937;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .file-upload-btn:hover {
+      background: white;
+      transform: scale(1.02);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .upload-status {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 20px;
+      height: 20px;
+      background: #10b981;
+      border-radius: 50%;
+      border: 2px solid white;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .upload-status.show {
+      display: flex;
+    }
+
+    .error-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ef4444;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10000;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .error-toast.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .success-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10000;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .success-toast.show {
+      display: block;
+    }
   </style>
+  <!-- CSV/Excel parsing libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app-wrapper">
@@ -729,8 +832,20 @@
           <span class="sound-icon">🔊</span>
           <span class="sound-text">Sound On</span>
         </button>
+        <div class="file-upload-wrapper">
+          <button class="file-upload-btn" id="fileUploadBtn">
+            <span>📁</span>
+            <span>Upload CSV/Excel</span>
+          </button>
+          <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls">
+          <div class="upload-status" id="uploadStatus">✓</div>
+        </div>
         <button class="start-button" id="newGameButton">New Game</button>
       </div>
+
+      <!-- Toast notifications -->
+      <div class="error-toast" id="errorToast"></div>
+      <div class="success-toast" id="successToast"></div>
 
       <!-- Stats Bar -->
       <div class="stats-bar">
@@ -850,6 +965,10 @@
         { term: 'Shukran', definition: 'Thank you in Arabic', id: 8 }
       ]
     };
+
+    // ==================== CUSTOM PACK STORAGE ====================
+    let customGamePack = null;
+    let customPackName = null;
 
     // ==================== DIFFICULTY SETTINGS ====================
     const difficultySettings = {
@@ -1099,7 +1218,8 @@
       PROXIMITY_DISTANCE = settings.proximityDistance;
 
       // Get content and shuffle
-      const fullContent = [...contentPacks[currentContent]];
+      // Use custom pack if available, otherwise use built-in content
+      const fullContent = customGamePack ? [...customGamePack] : [...contentPacks[currentContent]];
       shuffleArray(fullContent);
       gameData = fullContent.slice(0, totalPairs);
 
@@ -1677,6 +1797,161 @@
 
     document.getElementById('contentSelect').addEventListener('change', initializeGame);
     document.getElementById('difficultySelect').addEventListener('change', initializeGame);
+
+    // ==================== FILE UPLOAD FUNCTIONALITY ====================
+    const fileInput = document.getElementById('fileInput');
+    const fileUploadBtn = document.getElementById('fileUploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const errorToast = document.getElementById('errorToast');
+    const successToast = document.getElementById('successToast');
+
+    function showToast(message, isError = false) {
+      const toast = isError ? errorToast : successToast;
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    fileUploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name;
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+
+      if (!['csv', 'xlsx', 'xls'].includes(fileExtension)) {
+        showToast('Invalid file type. Please upload CSV or Excel file.', true);
+        return;
+      }
+
+      const reader = new FileReader();
+
+      if (fileExtension === 'csv') {
+        reader.onload = (e) => parseCSV(e.target.result, fileName);
+        reader.readAsText(file);
+      } else {
+        reader.onload = (e) => parseExcel(e.target.result, fileName);
+        reader.readAsArrayBuffer(file);
+      }
+    });
+
+    function parseCSV(csvText, fileName) {
+      try {
+        if (typeof Papa === 'undefined') {
+          showToast('CSV parser not loaded', true);
+          return;
+        }
+
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const data = results.data;
+
+            if (data.length === 0) {
+              showToast('CSV file is empty', true);
+              return;
+            }
+
+            // Check for required columns
+            const firstRow = data[0];
+            const keys = Object.keys(firstRow).map(k => k.toLowerCase());
+
+            if (!keys.includes('term') || !keys.includes('definition')) {
+              showToast('CSV must have "term" and "definition" columns', true);
+              return;
+            }
+
+            // Transform data
+            const newGameData = data.map((row, index) => {
+              const termKey = Object.keys(row).find(k => k.toLowerCase() === 'term');
+              const defKey = Object.keys(row).find(k => k.toLowerCase() === 'definition');
+
+              return {
+                term: row[termKey]?.trim() || '',
+                definition: row[defKey]?.trim() || '',
+                id: index + 1
+              };
+            }).filter(item => item.term && item.definition);
+
+            if (newGameData.length === 0) {
+              showToast('No valid term-definition pairs found', true);
+              return;
+            }
+
+            customGamePack = newGameData;
+            customPackName = fileName;
+            uploadStatus.classList.add('show');
+            showToast(`Loaded: ${fileName} (${newGameData.length} pairs)`);
+            initializeGame();
+          },
+          error: (error) => {
+            showToast(`CSV parsing error: ${error.message}`, true);
+          }
+        });
+      } catch (error) {
+        showToast(`Error reading CSV: ${error.message}`, true);
+      }
+    }
+
+    function parseExcel(arrayBuffer, fileName) {
+      try {
+        if (typeof XLSX === 'undefined') {
+          showToast('Excel parser not loaded', true);
+          return;
+        }
+
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet);
+
+        if (data.length === 0) {
+          showToast('Excel file is empty', true);
+          return;
+        }
+
+        // Check for required columns
+        const firstRow = data[0];
+        const keys = Object.keys(firstRow).map(k => k.toLowerCase());
+
+        if (!keys.includes('term') || !keys.includes('definition')) {
+          showToast('Excel must have "term" and "definition" columns', true);
+          return;
+        }
+
+        // Transform data
+        const newGameData = data.map((row, index) => {
+          const termKey = Object.keys(row).find(k => k.toLowerCase() === 'term');
+          const defKey = Object.keys(row).find(k => k.toLowerCase() === 'definition');
+
+          return {
+            term: String(row[termKey] || '').trim(),
+            definition: String(row[defKey] || '').trim(),
+            id: index + 1
+          };
+        }).filter(item => item.term && item.definition);
+
+        if (newGameData.length === 0) {
+          showToast('No valid term-definition pairs found', true);
+          return;
+        }
+
+        customGamePack = newGameData;
+        customPackName = fileName;
+        uploadStatus.classList.add('show');
+        showToast(`Loaded: ${fileName} (${newGameData.length} pairs)`);
+        initializeGame();
+      } catch (error) {
+        showToast(`Error reading Excel: ${error.message}`, true);
+      }
+    }
 
     // Start game
     initializeGame();
