@@ -87,12 +87,13 @@
     .circle-container {
       position: relative;
       width: 100%;
-      max-width: 900px;
+      max-width: 700px;
       margin: 0 auto;
       aspect-ratio: 1;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 120px 20px;
     }
 
     .circle-background {
@@ -100,11 +101,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 55%;
-      height: 55%;
+      width: 45%;
+      height: 45%;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, transparent 70%);
-      border: 1px dashed rgba(255,255,255,0.08);
+      background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 50%, transparent 70%);
+      border: 1px dashed rgba(255,255,255,0.06);
       pointer-events: none;
     }
 
@@ -118,7 +119,7 @@
 
     .definition-node {
       position: absolute;
-      width: 180px;
+      width: 160px;
       transform-origin: center;
       transition: all 0.3s ease;
     }
@@ -126,18 +127,19 @@
     .definition-card {
       background: rgba(255,255,255,0.95);
       color: #1f2937;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.5;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.4;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      height: 100px;
+      height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
       cursor: pointer;
+      font-weight: 500;
     }
 
     .definition-node.drag-over .definition-card {
@@ -171,27 +173,27 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 35%;
-      height: 35%;
+      width: 30%;
+      height: 30%;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px;
+      gap: 6px;
+      padding: 8px;
     }
 
     .term-card {
       background: #3b82f6;
       color: white;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 50px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       cursor: grab;
       user-select: none;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
       border: 2px solid transparent;
       white-space: nowrap;
       position: relative;
@@ -291,6 +293,7 @@
     @media (max-width: 768px) {
       .circle-container {
         max-width: 95vw;
+        padding: 100px 16px;
       }
 
       .definition-node {
@@ -300,12 +303,12 @@
       .definition-card {
         font-size: 11px;
         padding: 12px;
-        height: 90px;
+        height: 85px;
       }
 
       .term-card {
         font-size: 12px;
-        padding: 8px 16px;
+        padding: 7px 14px;
       }
 
       .game-title {
@@ -313,13 +316,17 @@
       }
 
       .terms-center {
-        width: 40%;
-        height: 40%;
-        gap: 6px;
+        width: 32%;
+        height: 32%;
+        gap: 5px;
       }
     }
 
     @media (max-width: 480px) {
+      .circle-container {
+        padding: 80px 12px;
+      }
+
       .definition-node {
         width: 120px;
       }
@@ -327,17 +334,18 @@
       .definition-card {
         font-size: 10px;
         padding: 10px;
-        height: 80px;
+        height: 75px;
       }
 
       .term-card {
         font-size: 11px;
-        padding: 8px 14px;
+        padding: 6px 12px;
       }
 
       .terms-center {
-        width: 42%;
-        height: 42%;
+        width: 35%;
+        height: 35%;
+        gap: 4px;
       }
     }
 
@@ -551,7 +559,7 @@
       const totalDefinitions = gameData.length;
       const angleStep = (2 * Math.PI) / totalDefinitions;
       const startAngle = -Math.PI / 2; // Start at top
-      const radius = 42; // Increased from 50 to push cards further out
+      const radius = 38; // Radius percentage for positioning
 
       gameData.forEach((item, index) => {
         const angle = startAngle + (index * angleStep);
@@ -560,7 +568,7 @@
         node.className = 'definition-node';
         node.dataset.correctId = item.id;
 
-        // Position around circle at larger radius
+        // Position around circle
         const x = 50 + radius * Math.cos(angle);
         const y = 50 + radius * Math.sin(angle);
         node.style.left = `${x}%`;
