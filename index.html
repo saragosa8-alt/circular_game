@@ -422,8 +422,8 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
-  <div class="version-badge">v3.2-snap-fixed</div>
-  <!-- Last updated: 2026-01-01 - Fixed magnetic snap coordinate system -->
+  <div class="version-badge">v3.3-selectable</div>
+  <!-- Last updated: 2026-01-01 - Fixed definition piece key lookup -->
   <script>
     const defaultConfig = {
       background_color: '#667eea',
@@ -607,7 +607,12 @@
       e.stopPropagation();
 
       const piece = e.currentTarget;
-      const pieceKey = `${piece.dataset.type}-${piece.dataset.id}`;
+
+      // FIX: Convert "definition" to "def" for the lookup key
+      const type = piece.dataset.type;
+      const id = piece.dataset.id;
+      const pieceKey = type === 'definition' ? `def-${id}` : `term-${id}`;
+
       const pieceData = pieces.get(pieceKey);
 
       if (!pieceData) {
@@ -992,8 +997,18 @@
     function handleTouchStart(e) {
       e.preventDefault();
       const piece = e.currentTarget;
-      const pieceKey = `${piece.dataset.type}-${piece.dataset.id}`;
+
+      // FIX: Convert "definition" to "def" for the lookup key
+      const type = piece.dataset.type;
+      const id = piece.dataset.id;
+      const pieceKey = type === 'definition' ? `def-${id}` : `term-${id}`;
+
       const pieceData = pieces.get(pieceKey);
+
+      if (!pieceData) {
+        console.error('Piece data not found for', pieceKey);
+        return;
+      }
 
       // Check if this piece is part of a matched pair
       const pairId = pieceData.matched ? pieceData.id : null;
