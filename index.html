@@ -103,14 +103,30 @@
 
     .play-area {
       position: relative;
-      width: 100%;
-      height: 700px;
-      max-width: 1200px;
+      width: 95vw;
+      height: 70vh;
+      max-width: 1400px;
+      min-height: 500px;
       margin: 0 auto;
       background: rgba(255,255,255,0.05);
       border-radius: 24px;
       border: 2px dashed rgba(255,255,255,0.1);
       overflow: visible;
+    }
+
+    @media (max-width: 1024px) {
+      .play-area {
+        height: 65vh;
+        min-height: 450px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .play-area {
+        height: 60vh;
+        min-height: 400px;
+        width: 98vw;
+      }
     }
 
     .game-piece {
@@ -406,8 +422,8 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
-  <div class="version-badge">v2.2-scatter</div>
-  <!-- Last updated: 2026-01-01 14:30 -->
+  <div class="version-badge">v3.0-snap</div>
+  <!-- Last updated: 2026-01-01 15:00 -->
   <script>
     const defaultConfig = {
       background_color: '#667eea',
@@ -587,15 +603,24 @@
 
     function handleMouseDown(e) {
       e.preventDefault();
+      e.stopPropagation();
+
       const piece = e.currentTarget;
       const pieceKey = `${piece.dataset.type}-${piece.dataset.id}`;
       const pieceData = pieces.get(pieceKey);
+
+      if (!pieceData) {
+        console.error('Piece data not found for', pieceKey);
+        return;
+      }
 
       // Check if this piece is part of a matched pair
       const pairId = pieceData.matched ? pieceData.id : null;
       const isDraggingPair = pairId !== null;
 
       const rect = piece.getBoundingClientRect();
+      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
+
       dragOffset.x = e.clientX - rect.left;
       dragOffset.y = e.clientY - rect.top;
 
@@ -608,6 +633,7 @@
       };
 
       piece.classList.add('dragging');
+      piece.style.zIndex = '1000';
 
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
@@ -671,10 +697,16 @@
       if (!currentDrag) return;
 
       currentDrag.piece.classList.remove('dragging');
+      currentDrag.piece.style.zIndex = '10';
 
       // Check if close enough to match
       if (!currentDrag.isDraggingPair) {
-        attemptMatch(currentDrag.pieceData);
+        const matched = attemptMatch(currentDrag.pieceData);
+
+        // If no match, check for overlaps and reposition if needed
+        if (!matched) {
+          resolveOverlap(currentDrag.pieceData);
+        }
       }
 
       // Clear in-range highlights
@@ -684,6 +716,58 @@
 
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+    }
+
+    function resolveOverlap(pieceData) {
+      const piece = pieceData.element;
+      const rect = piece.getBoundingClientRect();
+
+      // Check if this piece overlaps with any other piece
+      pieces.forEach((otherData, otherKey) => {
+        if (otherData === pieceData) return;
+
+        const otherRect = otherData.element.getBoundingClientRect();
+
+        // Check for overlap
+        const overlap = !(rect.right < otherRect.left ||
+                         rect.left > otherRect.right ||
+                         rect.bottom < otherRect.top ||
+                         rect.top > otherRect.bottom);
+
+        if (overlap) {
+          // Move the piece to a nearby non-overlapping position
+          const playArea = document.getElementById('playArea');
+          const areaRect = playArea.getBoundingClientRect();
+
+          // Try to move it to the right first
+          let newX = otherData.x + otherRect.width + 20;
+          let newY = pieceData.y;
+
+          // If that goes off screen, try below
+          if (newX + rect.width > areaRect.width) {
+            newX = pieceData.x;
+            newY = otherData.y + otherRect.height + 20;
+          }
+
+          // If that also goes off screen, try left
+          if (newY + rect.height > areaRect.height) {
+            newX = Math.max(20, otherData.x - rect.width - 20);
+            newY = pieceData.y;
+          }
+
+          // Apply new position with animation
+          piece.style.transition = 'all 0.3s ease';
+          piece.style.left = `${newX}px`;
+          piece.style.top = `${newY}px`;
+          pieceData.x = newX;
+          pieceData.y = newY;
+
+          // Reset transition after animation
+          setTimeout(() => {
+            piece.style.transition = 'all 0.3s ease';
+          }, 300);
+        }
+      });
     }
 
     function checkForPotentialMatches(pieceData) {
@@ -716,7 +800,7 @@
       const matchingPieceKey = `${otherType}-${pieceData.id}`;
       const matchingPiece = pieces.get(matchingPieceKey);
 
-      if (!matchingPiece || matchingPiece.matched) return;
+      if (!matchingPiece || matchingPiece.matched) return false;
 
       // Calculate distance
       const distance = Math.sqrt(
@@ -726,8 +810,53 @@
 
       // If within snap distance, connect them
       if (distance < SNAP_DISTANCE) {
-        createMatch(pieceData.id);
+        // Snap pieces together with animation
+        snapPiecesTogether(pieceData, matchingPiece);
+        return true;
       }
+
+      return false;
+    }
+
+    function snapPiecesTogether(piece1, piece2) {
+      // Determine which is term and which is definition
+      const termPiece = piece1.type === 'term' ? piece1 : piece2;
+      const defPiece = piece1.type === 'definition' ? piece1 : piece2;
+
+      // Calculate midpoint
+      const midX = (termPiece.x + defPiece.x) / 2;
+      const midY = (termPiece.y + defPiece.y) / 2;
+
+      // Position term to the left, definition to the right
+      const gap = 30;
+      const termRect = termPiece.element.getBoundingClientRect();
+      const defRect = defPiece.element.getBoundingClientRect();
+
+      const newTermX = midX - termRect.width / 2 - gap / 2;
+      const newTermY = midY - termRect.height / 2;
+      const newDefX = midX + defRect.width / 2 + gap / 2;
+      const newDefY = midY - defRect.height / 2;
+
+      // Animate the snap
+      termPiece.element.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      defPiece.element.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+      termPiece.element.style.left = `${newTermX}px`;
+      termPiece.element.style.top = `${newTermY}px`;
+      defPiece.element.style.left = `${newDefX}px`;
+      defPiece.element.style.top = `${newDefY}px`;
+
+      termPiece.x = newTermX;
+      termPiece.y = newTermY;
+      defPiece.x = newDefX;
+      defPiece.y = newDefY;
+
+      // Reset transitions and create match
+      setTimeout(() => {
+        termPiece.element.style.transition = 'all 0.3s ease';
+        defPiece.element.style.transition = 'all 0.3s ease';
+        createMatch(termPiece.id);
+      }, 400);
     }
 
     function createMatch(id) {
