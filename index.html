@@ -104,7 +104,7 @@
     .play-area {
       position: relative;
       width: 100%;
-      height: 600px;
+      height: 700px;
       max-width: 1200px;
       margin: 0 auto;
       background: rgba(255,255,255,0.05);
@@ -119,6 +119,7 @@
       user-select: none;
       transition: all 0.3s ease;
       transform-origin: center;
+      z-index: 10;
     }
 
     .game-piece:active {
@@ -149,15 +150,15 @@
     .definition-card {
       background: rgba(255,255,255,0.95);
       color: #1f2937;
-      padding: 16px;
+      padding: 14px 18px;
       border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.4;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      min-width: 180px;
-      max-width: 220px;
-      min-height: 80px;
+      width: 200px;
+      min-height: 70px;
+      max-height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -206,23 +207,25 @@
 
     .connector-line {
       position: absolute;
-      background: #8b5cf6;
-      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+      height: 4px;
       transform-origin: left center;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
       border-radius: 2px;
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
     }
 
     .connector-tab {
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       background: #8b5cf6;
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
       pointer-events: none;
+      z-index: 2;
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     @keyframes snap-animation {
@@ -442,14 +445,39 @@
     const pieces = new Map(); // Store piece data and state
     const matchedPairs = new Map(); // Store matched pairs
     const SNAP_DISTANCE = 150; // Distance in pixels for magnetic snap
+    const occupiedPositions = []; // Track occupied positions to avoid overlaps
+
+    function checkOverlap(x, y, width, height, minDistance = 100) {
+      for (let pos of occupiedPositions) {
+        const dx = x - pos.x;
+        const dy = y - pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     function getRandomPosition(playArea, pieceWidth, pieceHeight) {
       const areaWidth = playArea.offsetWidth || 1200;
-      const areaHeight = playArea.offsetHeight || 600;
+      const areaHeight = playArea.offsetHeight || 700;
 
-      const margin = 40;
-      const x = margin + Math.random() * (areaWidth - pieceWidth - margin * 2);
-      const y = margin + Math.random() * (areaHeight - pieceHeight - margin * 2);
+      const margin = 50;
+      let x, y;
+      let attempts = 0;
+      const maxAttempts = 50;
+
+      // Try to find a non-overlapping position
+      do {
+        x = margin + Math.random() * (areaWidth - pieceWidth - margin * 2);
+        y = margin + Math.random() * (areaHeight - pieceHeight - margin * 2);
+        attempts++;
+      } while (checkOverlap(x, y, pieceWidth, pieceHeight) && attempts < maxAttempts);
+
+      // Store this position
+      occupiedPositions.push({ x, y, width: pieceWidth, height: pieceHeight });
 
       return { x, y };
     }
@@ -464,6 +492,7 @@
       matchedCount = 0;
       pieces.clear();
       matchedPairs.clear();
+      occupiedPositions.length = 0; // Clear occupied positions
 
       // Create all pieces (both terms and definitions) and scatter them randomly
       gameData.forEach(item => {
@@ -754,10 +783,9 @@
 
       if (!line || !tab1 || !tab2) return;
 
-      // Get centers of pieces
+      // Get centers of pieces using their stored positions and actual dimensions
       const termRect = termPiece.element.getBoundingClientRect();
       const defRect = defPiece.element.getBoundingClientRect();
-      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
 
       const termCenterX = termPiece.x + termRect.width / 2;
       const termCenterY = termPiece.y + termRect.height / 2;
@@ -775,11 +803,11 @@
       line.style.width = `${length}px`;
       line.style.transform = `rotate(${angle}deg)`;
 
-      // Position tabs
-      tab1.style.left = `${termCenterX - 10}px`;
-      tab1.style.top = `${termCenterY - 10}px`;
-      tab2.style.left = `${defCenterX - 10}px`;
-      tab2.style.top = `${defCenterY - 10}px`;
+      // Position tabs (centered on the connector endpoints)
+      tab1.style.left = `${termCenterX - 8}px`;
+      tab1.style.top = `${termCenterY - 8}px`;
+      tab2.style.left = `${defCenterX - 8}px`;
+      tab2.style.top = `${defCenterY - 8}px`;
     }
 
     function handleTouchStart(e) {
