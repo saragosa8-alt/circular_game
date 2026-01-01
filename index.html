@@ -602,6 +602,7 @@
     let dragOffset = { x: 0, y: 0 };
 
     function handleMouseDown(e) {
+      console.log('CLICKED:', e.currentTarget.className, e.currentTarget.dataset);
       e.preventDefault();
       e.stopPropagation();
 
@@ -1109,6 +1110,13 @@
     function resetGame() {
       document.getElementById('successModal').classList.remove('show');
       initializeGame();
+      // Debug: verify all pieces have listeners
+      setTimeout(() => {
+        console.log('Pieces registered:', pieces.size);
+        pieces.forEach((data, key) => {
+          console.log(key, data.element.className);
+        });
+      }, 100);
     }
 
     document.getElementById('resetButton').addEventListener('click', resetGame);
