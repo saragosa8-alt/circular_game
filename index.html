@@ -163,12 +163,18 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      cursor: grab;
+      cursor: grab !important;
       font-weight: 500;
+      pointer-events: auto;
+    }
+
+    .definition-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
 
     .definition-card:active {
-      cursor: grabbing;
+      cursor: grabbing !important;
     }
 
     .game-piece.matched {
@@ -179,16 +185,20 @@
     .term-card {
       background: #3b82f6;
       color: white;
-      padding: 10px 20px;
-      border-radius: 50px;
+      padding: 10px 16px;
+      border-radius: 20px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       cursor: grab;
       user-select: none;
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border: 2px solid transparent;
-      white-space: nowrap;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 140px;
+      text-align: center;
+      line-height: 1.3;
       position: relative;
     }
 
@@ -396,8 +406,8 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
-  <div class="version-badge">v2.1-scatter</div>
-  <!-- Last updated: 2026-01-01 -->
+  <div class="version-badge">v2.2-scatter</div>
+  <!-- Last updated: 2026-01-01 14:30 -->
   <script>
     const defaultConfig = {
       background_color: '#667eea',
