@@ -31,7 +31,7 @@
     /* Header */
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .game-title {
@@ -47,13 +47,144 @@
       color: rgba(255,255,255,0.9);
     }
 
+    /* Settings Bar */
+    .settings-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .setting-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting-label {
+      color: rgba(255,255,255,0.9);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .setting-select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.95);
+      color: #1f2937;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      min-width: 120px;
+    }
+
+    .setting-select:focus {
+      outline: 2px solid #fbbf24;
+      outline-offset: 2px;
+    }
+
+    .sound-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.95);
+      color: #1f2937;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sound-toggle:hover {
+      background: white;
+      transform: scale(1.02);
+    }
+
+    .sound-toggle.muted {
+      background: rgba(255,255,255,0.6);
+      color: #6b7280;
+    }
+
+    .start-button {
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .start-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .stat-icon {
+      font-size: 18px;
+    }
+
+    .stat-value {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer {
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .timer.warning {
+      color: #fbbf24;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     /* Progress & Matched Area */
     .progress-section {
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(10px);
       border-radius: 16px;
       padding: 16px 20px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .progress-header {
@@ -93,11 +224,11 @@
 
     /* Matched Pairs Collection Area */
     .matched-area {
-      min-height: 60px;
+      min-height: 50px;
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      padding: 12px;
+      gap: 10px;
+      padding: 10px;
       background: rgba(255,255,255,0.08);
       border-radius: 12px;
       border: 2px dashed rgba(255,255,255,0.2);
@@ -124,10 +255,10 @@
     .matched-pair-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: rgba(255,255,255,0.95);
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: 6px 10px;
+      border-radius: 10px;
       box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -146,37 +277,49 @@
     .matched-pair-group .term-text {
       background: linear-gradient(135deg, #8b5cf6, #a78bfa);
       color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
+      padding: 4px 10px;
+      border-radius: 15px;
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11px;
       white-space: nowrap;
     }
 
     .matched-pair-group .equals {
       color: #8b5cf6;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .matched-pair-group .def-text {
       color: #4b5563;
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1.3;
-      max-width: 180px;
+      max-width: 150px;
     }
 
     /* Play Area */
     .play-area {
       position: relative;
       width: 100%;
-      height: 55vh;
-      min-height: 400px;
-      max-height: 600px;
+      height: 50vh;
+      min-height: 350px;
+      max-height: 550px;
       background: rgba(255,255,255,0.05);
       border-radius: 20px;
       border: 2px dashed rgba(255,255,255,0.15);
       overflow: hidden;
+    }
+
+    .play-area.disabled {
+      opacity: 0.7;
+    }
+
+    .play-area.disabled .game-piece {
+      pointer-events: none;
+    }
+
+    .start-overlay {
+      pointer-events: auto;
     }
 
     /* Game Pieces */
@@ -220,10 +363,10 @@
     .term-card {
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: white;
-      padding: 12px 20px;
-      border-radius: 25px;
+      padding: 10px 16px;
+      border-radius: 20px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
       white-space: nowrap;
     }
@@ -236,19 +379,42 @@
     .definition-card {
       background: rgba(255,255,255,0.95);
       color: #1f2937;
-      padding: 14px 18px;
-      border-radius: 14px;
-      font-size: 13px;
-      line-height: 1.45;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.4;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       text-align: center;
-      width: 180px;
-      max-width: 200px;
+      width: 160px;
+      max-width: 180px;
       font-weight: 500;
     }
 
     .definition-card:hover {
       box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Difficulty adjustments */
+    .difficulty-easy .term-card {
+      padding: 12px 20px;
+      font-size: 15px;
+    }
+
+    .difficulty-easy .definition-card {
+      width: 180px;
+      padding: 14px 16px;
+      font-size: 14px;
+    }
+
+    .difficulty-hard .term-card {
+      padding: 8px 12px;
+      font-size: 11px;
+    }
+
+    .difficulty-hard .definition-card {
+      width: 140px;
+      padding: 10px 12px;
+      font-size: 10px;
     }
 
     /* Wrong match shake */
@@ -281,6 +447,50 @@
       z-index: 2000;
     }
 
+    /* Start Overlay */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      border-radius: 20px;
+    }
+
+    .start-overlay.hidden {
+      display: none;
+    }
+
+    .start-overlay-text {
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .start-overlay-button {
+      padding: 14px 40px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .start-overlay-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
+    }
+
     /* Success Modal */
     .success-modal {
       position: fixed;
@@ -305,7 +515,7 @@
 
     .success-content {
       background: white;
-      padding: 40px 50px;
+      padding: 36px 44px;
       border-radius: 24px;
       text-align: center;
       max-width: 420px;
@@ -326,21 +536,69 @@
     }
 
     .success-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-
-    .success-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: #10b981;
+      font-size: 56px;
       margin-bottom: 12px;
     }
 
-    .success-message {
-      font-size: 16px;
+    .success-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 8px;
+    }
+
+    .success-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 20px 0;
+      padding: 16px;
+      background: #f3f4f6;
+      border-radius: 12px;
+    }
+
+    .success-stat {
+      text-align: center;
+    }
+
+    .success-stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .success-stat-label {
+      font-size: 12px;
       color: #6b7280;
-      margin-bottom: 28px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .star-rating {
+      font-size: 36px;
+      margin: 16px 0;
+      letter-spacing: 4px;
+    }
+
+    .star-rating .star {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .star-rating .star.earned {
+      animation: starPop 0.5s ease forwards;
+    }
+
+    @keyframes starPop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .success-message {
+      font-size: 15px;
+      color: #6b7280;
+      margin-bottom: 24px;
       line-height: 1.5;
     }
 
@@ -368,47 +626,73 @@
         padding: 12px;
       }
 
-      .play-area {
-        height: 50vh;
-        min-height: 350px;
+      .settings-bar {
+        gap: 8px;
+        padding: 10px 12px;
       }
 
-      .term-card {
-        padding: 10px 16px;
+      .setting-select {
+        min-width: 100px;
+        padding: 6px 10px;
         font-size: 12px;
       }
 
-      .definition-card {
-        width: 150px;
-        padding: 12px 14px;
-        font-size: 11px;
-      }
-
-      .matched-pair-group {
-        padding: 6px 10px;
-      }
-
-      .matched-pair-group .def-text {
-        max-width: 120px;
-        font-size: 10px;
-      }
-    }
-
-    @media (max-width: 480px) {
       .play-area {
         height: 45vh;
         min-height: 300px;
       }
 
+      .term-card {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+
       .definition-card {
-        width: 130px;
+        width: 140px;
         padding: 10px 12px;
+        font-size: 11px;
+      }
+
+      .matched-pair-group {
+        padding: 5px 8px;
+      }
+
+      .matched-pair-group .def-text {
+        max-width: 100px;
+        font-size: 9px;
+      }
+
+      .stats-bar {
+        gap: 8px;
+      }
+
+      .stat-item {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .play-area {
+        height: 40vh;
+        min-height: 280px;
+      }
+
+      .definition-card {
+        width: 120px;
+        padding: 8px 10px;
         font-size: 10px;
       }
 
       .matched-area {
-        gap: 8px;
+        gap: 6px;
         padding: 8px;
+        min-height: 40px;
+      }
+
+      .setting-group {
+        flex-wrap: wrap;
+        justify-content: center;
       }
     }
   </style>
@@ -421,6 +705,49 @@
         <p class="instructions">Drag pieces close together to match them!</p>
       </header>
 
+      <!-- Settings Bar -->
+      <div class="settings-bar">
+        <div class="setting-group">
+          <span class="setting-label">Subject:</span>
+          <select class="setting-select" id="contentSelect">
+            <option value="science">🔬 Science</option>
+            <option value="math">🔢 Math</option>
+            <option value="geography">🌍 Geography</option>
+            <option value="history">📜 History</option>
+            <option value="languages">🗣️ Languages</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <span class="setting-label">Difficulty:</span>
+          <select class="setting-select" id="difficultySelect">
+            <option value="easy">Easy (4 pairs)</option>
+            <option value="medium" selected>Medium (5 pairs)</option>
+            <option value="hard">Hard (7 pairs)</option>
+          </select>
+        </div>
+        <button class="sound-toggle" id="soundToggle">
+          <span class="sound-icon">🔊</span>
+          <span class="sound-text">Sound On</span>
+        </button>
+        <button class="start-button" id="newGameButton">New Game</button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-icon">⏱️</span>
+          <span class="stat-value timer" id="timerDisplay">0:00</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-value" id="attemptsDisplay">0 attempts</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">✨</span>
+          <span class="stat-value" id="streakDisplay">0 streak</span>
+        </div>
+      </div>
+
       <div class="progress-section">
         <div class="progress-header">
           <span class="progress-label">Progress</span>
@@ -432,7 +759,12 @@
         <div class="matched-area" id="matchedArea"></div>
       </div>
 
-      <div class="play-area" id="playArea"></div>
+      <div class="play-area disabled" id="playArea">
+        <div class="start-overlay" id="startOverlay">
+          <div class="start-overlay-text">Ready to play?</div>
+          <button class="start-overlay-button" id="startButton">Start Game</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -440,32 +772,338 @@
     <div class="success-content">
       <div class="success-icon">🎉</div>
       <h2 class="success-title">Amazing Job!</h2>
-      <p class="success-message">You matched all the terms correctly! You're a matching master!</p>
+      <div class="star-rating" id="starRating">
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+      </div>
+      <div class="success-stats">
+        <div class="success-stat">
+          <div class="success-stat-value" id="finalTime">0:00</div>
+          <div class="success-stat-label">Time</div>
+        </div>
+        <div class="success-stat">
+          <div class="success-stat-value" id="finalAttempts">0</div>
+          <div class="success-stat-label">Attempts</div>
+        </div>
+        <div class="success-stat">
+          <div class="success-stat-value" id="finalAccuracy">100%</div>
+          <div class="success-stat-label">Accuracy</div>
+        </div>
+      </div>
+      <p class="success-message" id="successMessage">You matched all the terms correctly!</p>
       <button class="reset-button" id="resetButton">Play Again</button>
     </div>
   </div>
 
   <script>
-    // Game data
-    const gameData = [
-      { term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into energy', id: 1 },
-      { term: 'Mitochondria', definition: 'The powerhouse of the cell that produces ATP', id: 2 },
-      { term: 'DNA', definition: 'Genetic material that carries hereditary information', id: 3 },
-      { term: 'Ecosystem', definition: 'A community of living organisms and their environment', id: 4 },
-      { term: 'Homeostasis', definition: 'The ability of an organism to maintain stable internal conditions', id: 5 }
-    ];
+    // ==================== CONTENT PACKS ====================
+    const contentPacks = {
+      science: [
+        { term: 'Photosynthesis', definition: 'Process by which plants convert sunlight into energy', id: 1 },
+        { term: 'Mitochondria', definition: 'The powerhouse of the cell that produces ATP', id: 2 },
+        { term: 'DNA', definition: 'Genetic material that carries hereditary information', id: 3 },
+        { term: 'Ecosystem', definition: 'A community of living organisms and their environment', id: 4 },
+        { term: 'Homeostasis', definition: 'The ability to maintain stable internal conditions', id: 5 },
+        { term: 'Evolution', definition: 'Change in species over generations through natural selection', id: 6 },
+        { term: 'Atom', definition: 'The smallest unit of matter that retains element properties', id: 7 },
+        { term: 'Gravity', definition: 'Force that attracts objects with mass toward each other', id: 8 }
+      ],
+      math: [
+        { term: 'π (Pi)', definition: 'Ratio of circumference to diameter, approximately 3.14159', id: 1 },
+        { term: 'Pythagorean', definition: 'a² + b² = c² for right triangles', id: 2 },
+        { term: 'Prime Number', definition: 'A number divisible only by 1 and itself', id: 3 },
+        { term: 'Fraction', definition: 'A part of a whole, written as numerator over denominator', id: 4 },
+        { term: 'Perimeter', definition: 'The total distance around a shape', id: 5 },
+        { term: 'Area', definition: 'The space inside a 2D shape, measured in square units', id: 6 },
+        { term: 'Variable', definition: 'A letter or symbol representing an unknown value', id: 7 },
+        { term: 'Equation', definition: 'A statement showing two expressions are equal', id: 8 }
+      ],
+      geography: [
+        { term: 'Tokyo', definition: 'Capital of Japan, world\'s most populous metro area', id: 1 },
+        { term: 'Sahara', definition: 'Largest hot desert, located in North Africa', id: 2 },
+        { term: 'Amazon', definition: 'Largest river by volume, flows through South America', id: 3 },
+        { term: 'Everest', definition: 'Tallest mountain on Earth, located in the Himalayas', id: 4 },
+        { term: 'Australia', definition: 'Only country that is also a continent', id: 5 },
+        { term: 'Pacific Ocean', definition: 'Largest and deepest ocean on Earth', id: 6 },
+        { term: 'Equator', definition: 'Imaginary line dividing Earth into Northern and Southern hemispheres', id: 7 },
+        { term: 'Antarctica', definition: 'Coldest, driest, and windiest continent', id: 8 }
+      ],
+      history: [
+        { term: '1776', definition: 'Year the United States declared independence', id: 1 },
+        { term: 'World War II', definition: 'Global conflict from 1939-1945', id: 2 },
+        { term: 'Renaissance', definition: 'Cultural rebirth in Europe, 14th-17th century', id: 3 },
+        { term: 'Ancient Egypt', definition: 'Civilization known for pyramids and pharaohs', id: 4 },
+        { term: 'Industrial Revolution', definition: 'Shift to machine manufacturing, began 1760s', id: 5 },
+        { term: 'Roman Empire', definition: 'Ancient civilization that ruled the Mediterranean', id: 6 },
+        { term: 'Moon Landing', definition: 'First humans on the moon, July 20, 1969', id: 7 },
+        { term: 'Cold War', definition: 'Political tension between USA and USSR, 1947-1991', id: 8 }
+      ],
+      languages: [
+        { term: 'Bonjour', definition: 'Hello in French', id: 1 },
+        { term: 'Gracias', definition: 'Thank you in Spanish', id: 2 },
+        { term: 'Danke', definition: 'Thank you in German', id: 3 },
+        { term: 'Ciao', definition: 'Hello/Goodbye in Italian', id: 4 },
+        { term: 'Arigatou', definition: 'Thank you in Japanese', id: 5 },
+        { term: 'Namaste', definition: 'Greeting in Hindi, means "I bow to you"', id: 6 },
+        { term: 'Annyeong', definition: 'Hello in Korean', id: 7 },
+        { term: 'Shukran', definition: 'Thank you in Arabic', id: 8 }
+      ]
+    };
 
-    // Game state
-    const pieces = new Map();
+    // ==================== DIFFICULTY SETTINGS ====================
+    const difficultySettings = {
+      easy: {
+        pairCount: 4,
+        snapDistance: 130,
+        proximityDistance: 150,
+        starThresholds: { three: 45, two: 75 } // seconds
+      },
+      medium: {
+        pairCount: 5,
+        snapDistance: 100,
+        proximityDistance: 120,
+        starThresholds: { three: 60, two: 100 }
+      },
+      hard: {
+        pairCount: 7,
+        snapDistance: 80,
+        proximityDistance: 100,
+        starThresholds: { three: 90, two: 150 }
+      }
+    };
+
+    // ==================== SOUND SYSTEM ====================
+    class SoundManager {
+      constructor() {
+        this.enabled = true;
+        this.audioContext = null;
+        this.initialized = false;
+      }
+
+      init() {
+        if (this.initialized) return;
+        try {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.initialized = true;
+        } catch (e) {
+          console.log('Audio not supported');
+        }
+      }
+
+      toggle() {
+        this.enabled = !this.enabled;
+        return this.enabled;
+      }
+
+      play(type) {
+        if (!this.enabled || !this.audioContext) return;
+        
+        // Resume context if suspended (required for user gesture)
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume();
+        }
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        const now = this.audioContext.currentTime;
+
+        switch(type) {
+          case 'pickup':
+            oscillator.frequency.setValueAtTime(400, now);
+            oscillator.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            oscillator.start(now);
+            oscillator.stop(now + 0.1);
+            break;
+
+          case 'drop':
+            oscillator.frequency.setValueAtTime(300, now);
+            oscillator.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+            gainNode.gain.setValueAtTime(0.08, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            oscillator.start(now);
+            oscillator.stop(now + 0.1);
+            break;
+
+          case 'proximity':
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(520, now);
+            gainNode.gain.setValueAtTime(0.05, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            oscillator.start(now);
+            oscillator.stop(now + 0.15);
+            break;
+
+          case 'correct':
+            // Play a happy chord
+            this.playChord([523.25, 659.25, 783.99], 0.3, 0.12); // C major
+            break;
+
+          case 'wrong':
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, now);
+            oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            oscillator.start(now);
+            oscillator.stop(now + 0.2);
+            break;
+
+          case 'victory':
+            // Play ascending victory melody
+            this.playMelody([523.25, 587.33, 659.25, 783.99], 0.15, 0.15);
+            break;
+
+          case 'start':
+            oscillator.frequency.setValueAtTime(440, now);
+            oscillator.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            oscillator.start(now);
+            oscillator.stop(now + 0.15);
+            break;
+        }
+      }
+
+      playChord(frequencies, duration, volume) {
+        if (!this.audioContext) return;
+        const now = this.audioContext.currentTime;
+        
+        frequencies.forEach(freq => {
+          const osc = this.audioContext.createOscillator();
+          const gain = this.audioContext.createGain();
+          osc.connect(gain);
+          gain.connect(this.audioContext.destination);
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(volume, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+          osc.start(now);
+          osc.stop(now + duration);
+        });
+      }
+
+      playMelody(frequencies, noteLength, volume) {
+        if (!this.audioContext) return;
+        const now = this.audioContext.currentTime;
+        
+        frequencies.forEach((freq, i) => {
+          const osc = this.audioContext.createOscillator();
+          const gain = this.audioContext.createGain();
+          osc.connect(gain);
+          gain.connect(this.audioContext.destination);
+          osc.frequency.setValueAtTime(freq, now + i * noteLength);
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.setValueAtTime(volume, now + i * noteLength);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + (i + 1) * noteLength);
+          osc.start(now + i * noteLength);
+          osc.stop(now + (i + 1) * noteLength);
+        });
+      }
+    }
+
+    const soundManager = new SoundManager();
+
+    // ==================== GAME STATE ====================
+    let gameData = [];
+    let pieces = new Map();
     let matchedCount = 0;
+    let totalPairs = 5;
     let currentDrag = null;
     let dragOffset = { x: 0, y: 0 };
+    let gameStarted = false;
+    let timerInterval = null;
+    let elapsedSeconds = 0;
+    let attempts = 0;
+    let streak = 0;
+    let currentDifficulty = 'medium';
+    let currentContent = 'science';
 
-    const PROXIMITY_DISTANCE = 120; // Distance for glow effect
-    const SNAP_DISTANCE = 100; // Distance to trigger match attempt
+    let PROXIMITY_DISTANCE = 120;
+    let SNAP_DISTANCE = 100;
 
-    // Initialize game
+    // ==================== TIMER ====================
+    function startTimer() {
+      elapsedSeconds = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(elapsedSeconds / 60);
+      const seconds = elapsedSeconds % 60;
+      const display = document.getElementById('timerDisplay');
+      display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      
+      // Add warning class if taking too long
+      const thresholds = difficultySettings[currentDifficulty].starThresholds;
+      if (elapsedSeconds > thresholds.two) {
+        display.classList.add('warning');
+      } else {
+        display.classList.remove('warning');
+      }
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // ==================== STATS ====================
+    function updateStats() {
+      document.getElementById('attemptsDisplay').textContent = `${attempts} attempt${attempts !== 1 ? 's' : ''}`;
+      document.getElementById('streakDisplay').textContent = `${streak} streak`;
+    }
+
+    function calculateStars() {
+      const thresholds = difficultySettings[currentDifficulty].starThresholds;
+      const accuracy = totalPairs / Math.max(attempts, totalPairs);
+      
+      // Time-based stars
+      let timeStars = 1;
+      if (elapsedSeconds <= thresholds.three) timeStars = 3;
+      else if (elapsedSeconds <= thresholds.two) timeStars = 2;
+      
+      // Accuracy bonus/penalty
+      if (accuracy >= 0.9) timeStars = Math.min(3, timeStars + 1);
+      else if (accuracy < 0.5) timeStars = Math.max(1, timeStars - 1);
+      
+      return Math.min(3, Math.max(1, timeStars));
+    }
+
+    // ==================== INITIALIZATION ====================
     function initializeGame() {
+      // Get settings
+      currentContent = document.getElementById('contentSelect').value;
+      currentDifficulty = document.getElementById('difficultySelect').value;
+      
+      const settings = difficultySettings[currentDifficulty];
+      totalPairs = settings.pairCount;
+      SNAP_DISTANCE = settings.snapDistance;
+      PROXIMITY_DISTANCE = settings.proximityDistance;
+
+      // Get content and shuffle
+      const fullContent = [...contentPacks[currentContent]];
+      shuffleArray(fullContent);
+      gameData = fullContent.slice(0, totalPairs);
+
+      // Reset state
       const playArea = document.getElementById('playArea');
       const matchedArea = document.getElementById('matchedArea');
       
@@ -473,8 +1111,47 @@
       matchedArea.innerHTML = '';
       pieces.clear();
       matchedCount = 0;
-      updateProgress();
+      attempts = 0;
+      streak = 0;
+      elapsedSeconds = 0;
+      gameStarted = false;
+      stopTimer();
 
+      // Set difficulty class
+      playArea.className = 'play-area disabled difficulty-' + currentDifficulty;
+
+      // Update UI
+      updateProgress();
+      updateStats();
+      updateTimerDisplay();
+
+      // Create start overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'start-overlay';
+      overlay.id = 'startOverlay';
+      overlay.innerHTML = `
+        <div class="start-overlay-text">Ready to match ${totalPairs} pairs?</div>
+        <button class="start-overlay-button" id="startButton">Start Game</button>
+      `;
+      playArea.appendChild(overlay);
+
+      document.getElementById('startButton').addEventListener('click', startGame);
+    }
+
+    function startGame() {
+      soundManager.init();
+      soundManager.play('start');
+      
+      gameStarted = true;
+      
+      const playArea = document.getElementById('playArea');
+      playArea.classList.remove('disabled');
+      
+      // Hide overlay
+      const overlay = document.getElementById('startOverlay');
+      overlay.classList.add('hidden');
+
+      // Generate pieces
       const areaRect = playArea.getBoundingClientRect();
       const positions = generateEdgePositions(areaRect.width, areaRect.height, gameData.length * 2);
 
@@ -521,44 +1198,57 @@
 
         playArea.appendChild(defEl);
       });
+
+      // Start timer
+      startTimer();
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     }
 
     // Generate positions biased toward edges
     function generateEdgePositions(width, height, count) {
       const positions = [];
-      const margin = 20;
-      const pieceWidth = 180;
-      const pieceHeight = 80;
+      const margin = 15;
+      const pieceWidth = currentDifficulty === 'hard' ? 140 : 170;
+      const pieceHeight = currentDifficulty === 'hard' ? 60 : 75;
 
-      // Define edge zones
-      const zones = [
-        { x: [margin, width * 0.3], y: [margin, height * 0.4] }, // top-left
-        { x: [width * 0.35, width * 0.65], y: [margin, height * 0.25] }, // top-center
-        { x: [width * 0.7, width - pieceWidth - margin], y: [margin, height * 0.4] }, // top-right
-        { x: [margin, width * 0.3], y: [height * 0.6, height - pieceHeight - margin] }, // bottom-left
-        { x: [width * 0.35, width * 0.65], y: [height * 0.75, height - pieceHeight - margin] }, // bottom-center
-        { x: [width * 0.7, width - pieceWidth - margin], y: [height * 0.6, height - pieceHeight - margin] }, // bottom-right
-        { x: [margin, width * 0.25], y: [height * 0.35, height * 0.65] }, // left-middle
-        { x: [width * 0.75, width - pieceWidth - margin], y: [height * 0.35, height * 0.65] }, // right-middle
-      ];
+      // Define edge zones based on count
+      const zones = [];
+      const cols = Math.ceil(Math.sqrt(count));
+      const rows = Math.ceil(count / cols);
+      
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const xStart = margin + (c / cols) * (width - pieceWidth - margin * 2);
+          const xEnd = margin + ((c + 1) / cols) * (width - pieceWidth - margin * 2);
+          const yStart = margin + (r / rows) * (height - pieceHeight - margin * 2);
+          const yEnd = margin + ((r + 1) / rows) * (height - pieceHeight - margin * 2);
+          zones.push({ x: [xStart, xEnd], y: [yStart, yEnd] });
+        }
+      }
 
       // Shuffle zones
-      const shuffledZones = [...zones].sort(() => Math.random() - 0.5);
+      shuffleArray(zones);
 
       for (let i = 0; i < count; i++) {
-        const zone = shuffledZones[i % shuffledZones.length];
+        const zone = zones[i % zones.length];
         
         let x, y, attempts = 0;
         do {
           x = zone.x[0] + Math.random() * (zone.x[1] - zone.x[0]);
           y = zone.y[0] + Math.random() * (zone.y[1] - zone.y[0]);
           attempts++;
-        } while (checkOverlap(positions, x, y, 100) && attempts < 20);
+        } while (checkOverlap(positions, x, y, 80) && attempts < 20);
 
         positions.push({
           x: Math.max(margin, Math.min(x, width - pieceWidth - margin)),
           y: Math.max(margin, Math.min(y, height - pieceHeight - margin)),
-          rotation: (Math.random() - 0.5) * 20
+          rotation: (Math.random() - 0.5) * 16
         });
       }
 
@@ -587,9 +1277,13 @@
       return el;
     }
 
-    // Drag handling
+    // ==================== DRAG HANDLING ====================
     function handleDragStart(e) {
+      if (!gameStarted) return;
       e.preventDefault();
+      
+      soundManager.play('pickup');
+      
       const piece = e.currentTarget;
       const pieceKey = getPieceKey(piece);
       const pieceData = pieces.get(pieceKey);
@@ -597,8 +1291,6 @@
       if (!pieceData || pieceData.matched) return;
 
       const rect = piece.getBoundingClientRect();
-      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
-
       dragOffset.x = e.clientX - rect.left;
       dragOffset.y = e.clientY - rect.top;
 
@@ -631,6 +1323,8 @@
     function handleDragEnd(e) {
       if (!currentDrag) return;
 
+      soundManager.play('drop');
+      
       currentDrag.piece.classList.remove('dragging');
       const rotation = currentDrag.pieceData.rotation;
       currentDrag.piece.style.transform = `rotate(${rotation}deg)`;
@@ -648,7 +1342,11 @@
 
     // Touch handling
     function handleTouchStart(e) {
+      if (!gameStarted) return;
       e.preventDefault();
+      
+      soundManager.play('pickup');
+      
       const touch = e.touches[0];
       const piece = e.currentTarget;
       const pieceKey = getPieceKey(piece);
@@ -690,6 +1388,8 @@
     function handleTouchEnd(e) {
       if (!currentDrag) return;
 
+      soundManager.play('drop');
+      
       currentDrag.piece.classList.remove('dragging');
       const rotation = currentDrag.pieceData.rotation;
       currentDrag.piece.style.transform = `rotate(${rotation}deg)`;
@@ -710,10 +1410,13 @@
     }
 
     // Check proximity to ALL other unmatched pieces
+    let lastProximitySound = 0;
+    
     function checkProximity(draggedPiece) {
       clearProximityHighlights();
 
       const draggedCenter = getPieceCenter(draggedPiece);
+      let foundProximity = false;
 
       pieces.forEach((otherPiece, key) => {
         if (otherPiece === draggedPiece || otherPiece.matched) return;
@@ -724,8 +1427,15 @@
         if (distance < PROXIMITY_DISTANCE) {
           draggedPiece.element.classList.add('in-proximity');
           otherPiece.element.classList.add('in-proximity');
+          foundProximity = true;
         }
       });
+
+      // Play proximity sound (throttled)
+      if (foundProximity && Date.now() - lastProximitySound > 300) {
+        soundManager.play('proximity');
+        lastProximitySound = Date.now();
+      }
     }
 
     function clearProximityHighlights() {
@@ -737,7 +1447,6 @@
     // Get center of piece
     function getPieceCenter(pieceData) {
       const rect = pieceData.element.getBoundingClientRect();
-      const playAreaRect = document.getElementById('playArea').getBoundingClientRect();
       return {
         x: pieceData.x + rect.width / 2,
         y: pieceData.y + rect.height / 2
@@ -769,19 +1478,29 @@
 
       if (!closestPiece || closestDistance > SNAP_DISTANCE) return;
 
+      // Count as attempt
+      attempts++;
+      updateStats();
+
       // Check if it's the correct match
       const isCorrectMatch = draggedPiece.id === closestPiece.id && 
                              draggedPiece.type !== closestPiece.type;
 
       if (isCorrectMatch) {
+        streak++;
+        updateStats();
         handleCorrectMatch(draggedPiece, closestPiece);
       } else {
+        streak = 0;
+        updateStats();
         handleWrongMatch(draggedPiece, closestPiece);
       }
     }
 
     // Handle correct match
     function handleCorrectMatch(piece1, piece2) {
+      soundManager.play('correct');
+      
       // Add celebration effect
       piece1.element.classList.add('correct-match');
       piece2.element.classList.add('correct-match');
@@ -838,16 +1557,18 @@
         updateProgress();
 
         // Check for win
-        if (matchedCount === gameData.length) {
-          setTimeout(() => {
-            document.getElementById('successModal').classList.add('show');
-          }, 500);
+        if (matchedCount === totalPairs) {
+          stopTimer();
+          soundManager.play('victory');
+          setTimeout(showVictory, 500);
         }
       }, 600);
     }
 
     // Handle wrong match
     function handleWrongMatch(piece1, piece2) {
+      soundManager.play('wrong');
+      
       piece1.element.classList.add('wrong-match');
       piece2.element.classList.add('wrong-match');
 
@@ -859,7 +1580,7 @@
       const dy = center2.y - center1.y;
       const distance = Math.sqrt(dx * dx + dy * dy) || 1;
       
-      const repelForce = 60;
+      const repelForce = 50;
       const repelX = (dx / distance) * repelForce;
       const repelY = (dy / distance) * repelForce;
 
@@ -874,7 +1595,7 @@
 
       // Keep within bounds
       const playArea = document.getElementById('playArea');
-      const bounds = { width: playArea.offsetWidth - 180, height: playArea.offsetHeight - 80 };
+      const bounds = { width: playArea.offsetWidth - 160, height: playArea.offsetHeight - 70 };
       
       piece1.x = Math.max(10, Math.min(piece1.x, bounds.width));
       piece1.y = Math.max(10, Math.min(piece1.y, bounds.height));
@@ -897,10 +1618,43 @@
 
     // Update progress
     function updateProgress() {
-      const total = gameData.length;
-      const percentage = (matchedCount / total) * 100;
+      const percentage = (matchedCount / totalPairs) * 100;
       document.getElementById('progressBar').style.width = `${percentage}%`;
-      document.getElementById('progressCount').textContent = `${matchedCount}/${total} Matched`;
+      document.getElementById('progressCount').textContent = `${matchedCount}/${totalPairs} Matched`;
+    }
+
+    // Show victory screen
+    function showVictory() {
+      const stars = calculateStars();
+      const accuracy = Math.round((totalPairs / Math.max(attempts, totalPairs)) * 100);
+      
+      document.getElementById('finalTime').textContent = formatTime(elapsedSeconds);
+      document.getElementById('finalAttempts').textContent = attempts;
+      document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+      
+      // Animate stars
+      const starContainer = document.getElementById('starRating');
+      const starEls = starContainer.querySelectorAll('.star');
+      starEls.forEach((star, i) => {
+        star.classList.remove('earned');
+        star.style.opacity = '0.3';
+        if (i < stars) {
+          setTimeout(() => {
+            star.classList.add('earned');
+            star.style.opacity = '1';
+          }, 200 + i * 200);
+        }
+      });
+
+      // Set message based on performance
+      const messages = {
+        3: "Perfect! You're a matching master! 🌟",
+        2: "Great job! You're getting really good! 👏",
+        1: "Nice work! Keep practicing to get faster! 💪"
+      };
+      document.getElementById('successMessage').textContent = messages[stars];
+
+      document.getElementById('successModal').classList.add('show');
     }
 
     // Reset game
@@ -909,8 +1663,20 @@
       initializeGame();
     }
 
-    // Event listeners
+    // ==================== EVENT LISTENERS ====================
     document.getElementById('resetButton').addEventListener('click', resetGame);
+    document.getElementById('newGameButton').addEventListener('click', initializeGame);
+    
+    document.getElementById('soundToggle').addEventListener('click', function() {
+      soundManager.init();
+      const enabled = soundManager.toggle();
+      this.classList.toggle('muted', !enabled);
+      this.querySelector('.sound-icon').textContent = enabled ? '🔊' : '🔇';
+      this.querySelector('.sound-text').textContent = enabled ? 'Sound On' : 'Sound Off';
+    });
+
+    document.getElementById('contentSelect').addEventListener('change', initializeGame);
+    document.getElementById('difficultySelect').addEventListener('change', initializeGame);
 
     // Start game
     initializeGame();
