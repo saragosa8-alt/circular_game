@@ -104,13 +104,13 @@
     .play-area {
       position: relative;
       width: 100%;
-      min-height: 600px;
+      height: 600px;
       max-width: 1200px;
       margin: 0 auto;
       background: rgba(255,255,255,0.05);
       border-radius: 24px;
       border: 2px dashed rgba(255,255,255,0.1);
-      overflow: hidden;
+      overflow: visible;
     }
 
     .game-piece {
@@ -444,8 +444,8 @@
     const SNAP_DISTANCE = 150; // Distance in pixels for magnetic snap
 
     function getRandomPosition(playArea, pieceWidth, pieceHeight) {
-      const areaWidth = playArea.offsetWidth;
-      const areaHeight = playArea.offsetHeight;
+      const areaWidth = playArea.offsetWidth || 1200;
+      const areaHeight = playArea.offsetHeight || 600;
 
       const margin = 40;
       const x = margin + Math.random() * (areaWidth - pieceWidth - margin * 2);
