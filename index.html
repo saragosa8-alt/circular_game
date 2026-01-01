@@ -422,8 +422,8 @@
     <p class="success-message" id="successMessage">You matched all the terms correctly!</p><button class="reset-button" id="resetButton">Play Again</button>
    </div>
   </div>
-  <div class="version-badge">v3.1-fixed</div>
-  <!-- Last updated: 2026-01-01 15:30 -->
+  <div class="version-badge">v3.2-snap-fixed</div>
+  <!-- Last updated: 2026-01-01 - Fixed magnetic snap coordinate system -->
   <script>
     const defaultConfig = {
       background_color: '#667eea',
@@ -778,14 +778,15 @@
 
       if (!matchingPiece || matchingPiece.matched) return;
 
-      // Get the center points of both pieces for accurate distance
+      // Use getBoundingClientRect for BOTH pieces consistently
       const rect1 = pieceData.element.getBoundingClientRect();
       const rect2 = matchingPiece.element.getBoundingClientRect();
 
-      const center1X = pieceData.x + rect1.width / 2;
-      const center1Y = pieceData.y + rect1.height / 2;
-      const center2X = matchingPiece.x + rect2.width / 2;
-      const center2Y = matchingPiece.y + rect2.height / 2;
+      // Calculate centers from viewport coordinates (consistent system)
+      const center1X = rect1.left + rect1.width / 2;
+      const center1Y = rect1.top + rect1.height / 2;
+      const center2X = rect2.left + rect2.width / 2;
+      const center2Y = rect2.top + rect2.height / 2;
 
       // Calculate distance between centers
       const distance = Math.sqrt(
@@ -811,14 +812,14 @@
 
       if (!matchingPiece || matchingPiece.matched) return false;
 
-      // Get the center points of both pieces for accurate distance
+      // Use consistent viewport coordinates
       const rect1 = pieceData.element.getBoundingClientRect();
       const rect2 = matchingPiece.element.getBoundingClientRect();
 
-      const center1X = pieceData.x + rect1.width / 2;
-      const center1Y = pieceData.y + rect1.height / 2;
-      const center2X = matchingPiece.x + rect2.width / 2;
-      const center2Y = matchingPiece.y + rect2.height / 2;
+      const center1X = rect1.left + rect1.width / 2;
+      const center1Y = rect1.top + rect1.height / 2;
+      const center2X = rect2.left + rect2.width / 2;
+      const center2Y = rect2.top + rect2.height / 2;
 
       // Calculate distance between centers
       const distance = Math.sqrt(
