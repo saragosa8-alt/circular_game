@@ -1,0 +1,591 @@
+/* Settings Bar */
+.settingsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.settingGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settingLabel {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.settingSelect {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.settingSelect:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.startButton {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.startButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+/* Stats Bar */
+.statsBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.statIcon {
+  font-size: 18px;
+}
+
+.statValue {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Progress Section */
+.progressSection {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progressLabel {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.progressCount {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.progressBarBg {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progressBarFill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Matched Area */
+.matchedArea {
+  min-height: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.matchedArea:has(.matchedPairGroup) {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.matchedAreaEmpty {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.matchedPairGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.termText {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.equals {
+  color: #8b5cf6;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.defText {
+  color: #4b5563;
+  font-size: 10px;
+  line-height: 1.3;
+  max-width: 150px;
+}
+
+/* Play Area */
+.playArea {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 350px;
+  max-height: 550px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.playArea.disabled {
+  opacity: 0.7;
+}
+
+.playArea.disabled :global(.game-piece) {
+  pointer-events: none;
+}
+
+/* Start Overlay */
+.startOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  border-radius: 20px;
+}
+
+.startOverlayText {
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.startOverlayButton {
+  padding: 14px 40px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
+}
+
+.startOverlayButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
+}
+
+/* Game Pieces */
+:global(.game-piece) {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+}
+
+:global(.game-piece):hover {
+  z-index: 100;
+}
+
+.dragging {
+  cursor: grabbing !important;
+  z-index: 1000 !important;
+  transform: scale(1.08) rotate(0deg) !important;
+}
+
+/* Term Card */
+.termCard {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  white-space: nowrap;
+}
+
+.termCard:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Definition Card */
+.definitionCard {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  width: 160px;
+  max-width: 180px;
+  font-weight: 500;
+}
+
+.definitionCard:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Difficulty adjustments */
+.difficultyEasy .termCard {
+  padding: 12px 20px;
+  font-size: 15px;
+}
+
+.difficultyEasy .definitionCard {
+  width: 180px;
+  padding: 14px 16px;
+  font-size: 14px;
+}
+
+.difficultyHard .termCard {
+  padding: 8px 12px;
+  font-size: 11px;
+}
+
+.difficultyHard .definitionCard {
+  width: 140px;
+  padding: 10px 12px;
+  font-size: 10px;
+}
+
+/* Proximity Glow */
+.inProximity {
+  animation: proximityGlow 0.8s ease-in-out infinite;
+}
+
+@keyframes proximityGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.7), 0 0 40px rgba(251, 191, 36, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.9), 0 0 60px rgba(251, 191, 36, 0.5),
+      0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Wrong Match */
+.wrongMatch {
+  animation: wrongShake 0.5s ease;
+}
+
+@keyframes wrongShake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(var(--rotation, 0deg));
+  }
+  20% {
+    transform: translateX(-8px) rotate(calc(var(--rotation, 0deg) - 3deg));
+  }
+  40% {
+    transform: translateX(8px) rotate(calc(var(--rotation, 0deg) + 3deg));
+  }
+  60% {
+    transform: translateX(-6px) rotate(calc(var(--rotation, 0deg) - 2deg));
+  }
+  80% {
+    transform: translateX(6px) rotate(calc(var(--rotation, 0deg) + 2deg));
+  }
+}
+
+/* Correct Match */
+.correctMatch {
+  animation: correctPop 0.4s ease;
+}
+
+@keyframes correctPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Success Modal */
+.successModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.successContent {
+  background: white;
+  padding: 36px 44px;
+  border-radius: 24px;
+  text-align: center;
+  max-width: 420px;
+  margin: 20px;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.successIcon {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+
+.successTitle {
+  font-size: 26px;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 8px;
+}
+
+.starRating {
+  font-size: 36px;
+  margin: 16px 0;
+  letter-spacing: 4px;
+}
+
+.star {
+  display: inline-block;
+  opacity: 0.3;
+}
+
+.starEarned {
+  display: inline-block;
+  animation: starPop 0.5s ease forwards;
+}
+
+@keyframes starPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.successStats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 20px 0;
+  padding: 16px;
+  background: #f3f4f6;
+  border-radius: 12px;
+}
+
+.successStat {
+  text-align: center;
+}
+
+.successStatValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.successStatLabel {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.successMessage {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.resetButton {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.resetButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .playArea {
+    height: 45vh;
+    min-height: 300px;
+  }
+
+  .termCard {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .definitionCard {
+    width: 140px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .matchedPairGroup {
+    padding: 5px 8px;
+  }
+
+  .defText {
+    max-width: 100px;
+    font-size: 9px;
+  }
+
+  .statsBar {
+    gap: 8px;
+  }
+
+  .statItem {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .playArea {
+    height: 40vh;
+    min-height: 280px;
+  }
+
+  .definitionCard {
+    width: 120px;
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .matchedArea {
+    gap: 6px;
+    padding: 8px;
+    min-height: 40px;
+  }
+}
